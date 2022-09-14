@@ -1,0 +1,11 @@
+# Created by Nolmetar
+### KCC_CRU_TS ###
+
+.idea
+venv
+DATA
+OUTPUT
+notes.py
+example_output.json
+
+# End of Nolmetar
