@@ -5,6 +5,8 @@
 venv
 DATA
 OUTPUT
+__pycache__
+KCC_CRU_TS/__pycache__
 notes.py
 example_output.json
 
