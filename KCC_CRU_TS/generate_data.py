@@ -65,6 +65,7 @@ def generate_climates():
 
 
 # !! WARNING Af IS EQUAL TO z !!
+# Test
 def main() -> None:
     start_time = time.time()
     print("Main: Start program")
