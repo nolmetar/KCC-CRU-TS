@@ -1,1 +1,1 @@
-from .generate_data import main
+from .main_menu import main

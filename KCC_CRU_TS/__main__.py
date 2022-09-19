@@ -1,4 +1,4 @@
-from .generate_data import main
+from .main_menu import main
 
 if __name__ == "__main__":
     try:
