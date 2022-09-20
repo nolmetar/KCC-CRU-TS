@@ -2,6 +2,7 @@
 import time
 
 from .generate_data import GenerateData
+from .generate_maps import GenerateMaps
 
 
 # !! WARNING Af IS EQUAL TO z !!
@@ -11,6 +12,9 @@ def main() -> None:
     print("Main: Start program")
 
     gd = GenerateData()
+    gm = GenerateMaps()
+
+    gm.tests()
 
     choice = -1
     while choice != 0:
