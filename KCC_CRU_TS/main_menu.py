@@ -14,8 +14,6 @@ def main() -> None:
     gd = GenerateData()
     gm = GenerateMaps()
 
-    gm.tests()
-
     choice = -1
     while choice != 0:
         print("Main: Choose action:")
