@@ -6,7 +6,7 @@ from .generate_maps import GenerateMaps
 
 
 # !! WARNING Af IS EQUAL TO z !!
-# Test
+# TODO finish that menu
 def main() -> None:
     start_time = time.time()
     print("Main: Start program")
@@ -28,11 +28,11 @@ def main() -> None:
 
         if choice == 1:
             print("Main: 1 - Generate Data Preview")
-            gd.generate_climates(preview=True)
+            gd.generate_data(preview=True)
             break
         elif choice == 2:
             print("Main: 2 - Generate ALL Data")
-            gd.generate_climates(preview=False)
+            gd.generate_data(preview=False)
             break
         elif choice == 3:
             print("Main: 3 - Generate Picture Maps Preview")

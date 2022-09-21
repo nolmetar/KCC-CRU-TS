@@ -8,6 +8,7 @@ class Compute:
     def __init__(self):
         print("Compute: init")
 
+    # TODO adapt for 5 points (A B C D A) to draw shape
     @staticmethod
     def gen_shape(lat: float, lon: float):
         shape = list()

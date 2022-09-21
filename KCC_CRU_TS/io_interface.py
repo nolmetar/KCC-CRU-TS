@@ -15,6 +15,8 @@ class IOInterface:
         self.__const = dict()
         self.__data_imported = False
 
+    # TODO only need to check data if 2 data source are involved to compute data
+    # TODO Climates, wet bulb, etc
     def check_data(self, data: dict):
         f_tmp = netCDF4.Dataset(data["tmp"])
         f_pre = netCDF4.Dataset(data["pre"])
@@ -37,6 +39,7 @@ class IOInterface:
         f_pre.close()
         print("IO: Compat checked")
 
+    # TODO Multiple import funct for each data
     def import_data(self, data: dict):
         print("IO: import data")
         f_tmp = netCDF4.Dataset(data["tmp"])
@@ -72,6 +75,7 @@ class IOInterface:
         self.__data_imported = True
         print("IO: data imported")
 
+    # TODO adapt export to GEOJson
     @staticmethod
     def export_data_open(out_dir, file):
         path = out_dir + "/" + file + ".json"

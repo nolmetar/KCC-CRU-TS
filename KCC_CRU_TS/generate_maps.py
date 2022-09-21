@@ -8,6 +8,7 @@ class GenerateMaps:
     def __init__(self):
         print("Generate Maps: init")
 
+    # TODO figure out how to generate rectangles on map ...
     @staticmethod
     def tests():
         print("test")
