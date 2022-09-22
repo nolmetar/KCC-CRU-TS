@@ -11,7 +11,7 @@ class GenerateMaps:
     # TODO figure out how to generate rectangles on map ...
     @staticmethod
     def tests():
-        print("test")
+        print("Generate Maps: tests")
 
         ax = plt.axes(projection=ccrs.PlateCarree())
         ax.coastlines()

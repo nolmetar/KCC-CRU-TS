@@ -75,47 +75,46 @@ class IOInterface:
         self.__data_imported = True
         print("IO: data imported")
 
-    # TODO adapt export to GEOJson
-    @staticmethod
-    def export_data_open(out_dir, file):
-        path = out_dir + "/" + file + ".json"
-        if not os.path.exists(out_dir):
-            os.mkdir(out_dir)
-        f = open(path, "a")
-        f.write("{")
-        f.close()
-        print("IO: file {} opened".format(file))
+    # @staticmethod
+    # def export_data_open(out_dir, file):
+    #     path = out_dir + "/" + file + ".json"
+    #     if not os.path.exists(out_dir):
+    #         os.mkdir(out_dir)
+    #     f = open(path, "a")
+    #     f.write("{")
+    #     f.close()
+    #     print("IO: file {} opened".format(file))
 
-    @staticmethod
-    def export_data_save(out_dir, file, year, data):
-        path = out_dir + "/" + file + ".json"
-        if not os.path.exists(out_dir):
-            os.mkdir(out_dir)
-        data_json = json.dumps(data, indent=4)
-        f = open(path, "a")
-        f.write('"' + str(year) + '" : ')
-        f.write(data_json)
-        f.close()
-        print("IO: file {} saved".format(file))
+    # @staticmethod
+    # def export_data_save(out_dir, file, year, data):
+    #     path = out_dir + "/" + file + ".json"
+    #     if not os.path.exists(out_dir):
+    #         os.mkdir(out_dir)
+    #     data_json = json.dumps(data, indent=4)
+    #     f = open(path, "a")
+    #     f.write('"' + str(year) + '" : ')
+    #     f.write(data_json)
+    #     f.close()
+    #     print("IO: file {} saved".format(file))
 
-    @staticmethod
-    def export_data_comma(out_dir, file):
-        path = out_dir + "/" + file + ".json"
-        if not os.path.exists(out_dir):
-            os.mkdir(out_dir)
-        f = open(path, "a")
-        f.write(",")
-        f.close()
+    # @staticmethod
+    # def export_data_comma(out_dir, file):
+    #     path = out_dir + "/" + file + ".json"
+    #     if not os.path.exists(out_dir):
+    #         os.mkdir(out_dir)
+    #     f = open(path, "a")
+    #     f.write(",")
+    #     f.close()
 
-    @staticmethod
-    def export_data_close(out_dir, file):
-        path = out_dir + "/" + file + ".json"
-        if not os.path.exists(out_dir):
-            os.mkdir(out_dir)
-        f = open(path, "a")
-        f.write("}")
-        f.close()
-        print("IO: file {} closed".format(file))
+    # @staticmethod
+    # def export_data_close(out_dir, file):
+    #     path = out_dir + "/" + file + ".json"
+    #     if not os.path.exists(out_dir):
+    #         os.mkdir(out_dir)
+    #     f = open(path, "a")
+    #     f.write("}")
+    #     f.close()
+    #     print("IO: file {} closed".format(file))
 
     @staticmethod
     def __check_compat(name: str, var1, var2):
@@ -167,6 +166,11 @@ class IOInterface:
             else:
                 data_year.append(float(self.__data[year][i][name][lat_index][lon_index]))
         return data_year
+
+    # TODO adapt export to GEOJson
+    @staticmethod
+    def export_data(out_dir, file, coords: list, props: dict):
+        print("export")
 
     def tests(self):
         print("IO: test")

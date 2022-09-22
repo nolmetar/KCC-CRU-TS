@@ -22,7 +22,23 @@ class GenerateData:
 
     # TODO main loop goes here
     def generate_data(self, preview: bool):
-        self.__generate_climates(preview)
+        # self.__generate_climates(preview)
+
+        self.io.import_data(DATA)
+
+        lat_len = self.io.get_lat_len()
+        lon_len = self.io.get_lon_len()
+        years = []
+        if preview:
+            years = [2021]
+        else:
+            years = self.io.get_years()
+
+        for year in years:
+            print("Generate Data: Generating {0:.2f}%".format((years.index(year) / len(years)) * 100))
+            for lat in range(lat_len):
+                for lon in range(lon_len):
+                    a = 1
 
     # TODO one funct for each data: climate, temp, pre, wet bulb, etc
     # TODO remove loop
