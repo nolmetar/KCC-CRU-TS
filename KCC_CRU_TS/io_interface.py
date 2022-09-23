@@ -17,6 +17,8 @@ class IOInterface:
 
     # TODO only need to check data if 2 data source are involved to compute data
     # TODO Climates, wet bulb, etc
+    # TODO Compare every data input for var: Variables, longitudes, latitudes, time
+    # TODO Compare every var for climate (tmp, pre) and wet bulb (tmp, vap)(tmn, vap)(tmx, vap)
     def check_data(self, data: dict):
         f_tmp = netCDF4.Dataset(data["tmp"])
         f_pre = netCDF4.Dataset(data["pre"])
@@ -29,6 +31,7 @@ class IOInterface:
         self.__check_compat("Longitude", f_tmp.variables["lon"][:].size, f_pre.variables["lon"][:].size)
         self.__check_compat("Latitude", f_tmp.variables["lat"][:].size, f_pre.variables["lat"][:].size)
         self.__check_compat("Time", f_tmp.variables["time"][:].size, f_pre.variables["time"][:].size)
+        # longest \/ only for climate and wet bulb
         self.__check_compat("Data", f_tmp.variables["tmp"][:, :, :].size, f_pre.variables["pre"][:, :, :].size)
         self.__check_compat("Stations", f_tmp.variables["stn"][:, :, :].size, f_pre.variables["stn"][:, :, :].size)
         self.__check_compat_a("Longitude values", f_tmp.variables["lon"][:], f_pre.variables["lon"][:])

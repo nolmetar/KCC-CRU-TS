@@ -7,7 +7,12 @@ from .koppen import Koppen
 
 DATA = {
     "tmp": "DATA/cru_ts4.06.1901.2021.tmp.dat.nc",
-    "pre": "DATA/cru_ts4.06.1901.2021.pre.dat.nc"
+    "pre": "DATA/cru_ts4.06.1901.2021.pre.dat.nc",
+    "cld": "DATA/cru_ts4.06.01.1901.2021.cld.dat.nc",
+    "tmn": "DATA/cru_ts4.06.1901.2021.tmn.dat.nc",
+    "tmx": "DATA/cru_ts4.06.1901.2021.tmx.dat.nc",
+    "vap": "DATA/cru_ts4.06.1901.2021.vap.dat.nc",
+    "wet": "DATA/cru_ts4.06.1901.2021.wet.dat.nc"
 }
 OUTPUT_DIR = "OUTPUT"
 
@@ -18,7 +23,7 @@ class GenerateData:
         self.io = IOInterface()
         self.co = Compute()
         self.ko = Koppen()
-        # io.check_data(DATA)
+        # self.io.check_data(DATA)
 
     # TODO main loop goes here
     def generate_data(self, preview: bool):

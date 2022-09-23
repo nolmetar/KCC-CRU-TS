@@ -32,16 +32,19 @@ def main() -> None:
             break
         elif choice == 2:
             print("Main: 2 - Generate ALL Data")
-            gd.generate_data(preview=False)
+            #gd.generate_data(preview=False)
+            print("Disabled for safety reason")
             break
         elif choice == 3:
             print("Main: 3 - Generate Picture Maps Preview")
             break
         elif choice == 4:
             print("Main: 4 - Generate ALL Picture Maps")
+            print("Disabled for safety reason")
             break
         elif choice == 5:
             print("Main: 5 - Upload ALL Data")
+            print("Disabled for safety reason")
             break
         elif choice == 6:
             print("Main: 6 - Generate/Upload All Data/Maps")
