@@ -12,7 +12,7 @@ def main() -> None:
     print("Main: Start program")
 
     gd = GenerateData()
-    gm = GenerateMaps()
+    # gm = GenerateMaps()
 
     choice = -1
     while choice != 0:
@@ -32,7 +32,7 @@ def main() -> None:
             break
         elif choice == 2:
             print("Main: 2 - Generate ALL Data")
-            #gd.generate_data(preview=False)
+            # gd.generate_data(preview=False)
             print("Disabled for safety reason")
             break
         elif choice == 3:

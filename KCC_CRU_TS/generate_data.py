@@ -1,5 +1,6 @@
 #!python3
 from datetime import datetime
+import random
 
 from .io_interface import IOInterface
 from .compute import Compute
@@ -23,35 +24,36 @@ class GenerateData:
         self.io = IOInterface()
         self.co = Compute()
         self.ko = Koppen()
-        # self.io.check_data(DATA)
+        self.io.check_const(DATA)
+        self.io.import_data_const(DATA)
 
     # TODO main loop goes here
     def generate_data(self, preview: bool):
+        self.__generate_climates(preview)
+
         # self.__generate_climates(preview)
 
-        self.io.import_data(DATA)
+        # self.io.import_data(DATA)
 
-        lat_len = self.io.get_lat_len()
-        lon_len = self.io.get_lon_len()
-        years = []
-        if preview:
-            years = [2021]
-        else:
-            years = self.io.get_years()
-
-        for year in years:
-            print("Generate Data: Generating {0:.2f}%".format((years.index(year) / len(years)) * 100))
-            for lat in range(lat_len):
-                for lon in range(lon_len):
-                    a = 1
+        # lat_len = self.io.get_lat_len()
+        # lon_len = self.io.get_lon_len()
+        # years = []
+        # if preview:
+        #     years = [2021]
+        # else:
+        #     years = self.io.get_years()
+        #
+        # for year in years:
+        #     print("Generate Data: Generating {0:.2f}%".format((years.index(year) / len(years)) * 100))
+        #     for lat in range(lat_len):
+        #         for lon in range(lon_len):
+        #             a = 1
 
     # TODO one funct for each data: climate, temp, pre, wet bulb, etc
     # TODO remove loop
     def __generate_climates(self, preview: bool):
-        self.io.import_data(DATA)
-
-        file_name = "Koppen-climates_" + datetime.now().strftime("%Y%m%d-%H%M%S")
-        self.io.export_data_open(OUTPUT_DIR, file_name)
+        self.io.check_data(DATA, ["tmp", "pre"])
+        self.io.import_data(DATA, ["tmp", "pre"])
 
         print("Generate Data: Starting climate generation")
         lat_len = self.io.get_lat_len()
@@ -62,8 +64,6 @@ class GenerateData:
             years = self.io.get_years()
         for year in years:
             print("Generate Data: Generating {0:.2f}%".format((years.index(year) / len(years)) * 100))
-            if not years.index(year) == 0:
-                self.io.export_data_comma(OUTPUT_DIR, file_name)
             data_output = list()
             for lat in range(lat_len):
                 for lon in range(lon_len):
@@ -87,9 +87,9 @@ class GenerateData:
                         data_lat_lon["data"]["color"] = self.ko.get_color(symbols)
                     data_output.append(data_lat_lon)
                 # break
-            self.io.export_data_save(OUTPUT_DIR, file_name, year, data_output)
-            break
-        self.io.export_data_close(OUTPUT_DIR, file_name)
+            print(len(data_output))
+            for i in range(0, 20):
+                print(data_output[random.randint(0, 259199)])
+            # self.io.export_data_save(OUTPUT_DIR, file_name, year, data_output)
+        self.io.reset_data()
         print("Generate Data: Finished generation")
-
-

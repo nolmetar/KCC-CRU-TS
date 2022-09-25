@@ -329,7 +329,8 @@ class Koppen:
             return True
         elif winter_pre >= tot_pre_r * 0.7 and tot_pre_r < (20 * avg_tmp_t):
             return True
-        elif (not summer_pre >= tot_pre_r * 0.7 and not winter_pre >= tot_pre_r * 0.7) and tot_pre_r < (20 * avg_tmp_t) + 140:
+        elif (not summer_pre >= tot_pre_r * 0.7 and not winter_pre >= tot_pre_r * 0.7) \
+                and tot_pre_r < (20 * avg_tmp_t) + 140:
             return True
         return False
 

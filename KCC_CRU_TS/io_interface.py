@@ -7,49 +7,86 @@ import os
 import json
 
 
-# 50.180582, 5.864852 Cherain
 class IOInterface:
     def __init__(self):
         print("IO: init")
         self.__data = dict()
         self.__const = dict()
-        self.__data_imported = False
+        self.__checked_const = False
+        self.__checked_data = []
+        self.__imported_const = False
+        self.__imported_data = []
 
-    # TODO only need to check data if 2 data source are involved to compute data
-    # TODO Climates, wet bulb, etc
-    # TODO Compare every data input for var: Variables, longitudes, latitudes, time
-    # TODO Compare every var for climate (tmp, pre) and wet bulb (tmp, vap)(tmn, vap)(tmx, vap)
-    def check_data(self, data: dict):
+    def check_const(self, data: dict):
+        print("IO: Check const compat")
+        checked = list()
+        for key1 in data:
+            file1 = netCDF4.Dataset(data[key1])
+            for key2 in data:
+                if key1 != key2:
+                    check = (key1, key2)
+                    check_i = (key2, key1)
+                    if check not in checked:
+                        file2 = netCDF4.Dataset(data[key2])
+                        self.__check_compat("Variables " + key1 + "/" + key2, len(file1.variables.keys()),
+                                            len(file2.variables.keys()))
+                        self.__check_compat("Longitude " + key1 + "/" + key2, file1.variables["lon"][:].size,
+                                            file2.variables["lon"][:].size)
+                        self.__check_compat("Latitude " + key1 + "/" + key2, file1.variables["lat"][:].size,
+                                            file2.variables["lat"][:].size)
+                        self.__check_compat("Time " + key1 + "/" + key2, file1.variables["time"][:].size,
+                                            file2.variables["time"][:].size)
+                        file2.close()
+                        checked.append(check_i)
+            file1.close()
+        self.__checked_const = True
+        print("IO: Checked const compat")
+
+    def check_data(self, data: dict, keys: list):
+        print("IO: Check data compat")
+        if not self.__checked_const:
+            print("IO: Const not checked")
+            sys.exit(0)
+        for key in keys:
+            if key not in data.keys():
+                print("IO: {} not in data".format(key))
+                sys.exit(0)
+
+        checked = list()
+        for key1 in keys:
+            file1 = netCDF4.Dataset(data[key1])
+            for key2 in keys:
+                if key1 != key2:
+                    check = (key1, key2)
+                    check_i = (key2, key1)
+                    if check not in checked:
+                        file2 = netCDF4.Dataset(data[key2])
+                        self.__check_compat("Data " + key1 + "/" + key2, file1.variables[key1][:, :, :].size,
+                                            file2.variables[key2][:, :, :].size)
+                        self.__check_compat("Stations " + key1 + "/" + key2, file1.variables["stn"][:, :, :].size,
+                                            file2.variables["stn"][:, :, :].size)
+                        self.__check_compat_a("Longitude values " + key1 + "/" + key2, file1.variables["lon"][:],
+                                              file2.variables["lon"][:])
+                        self.__check_compat_a("Latitude values " + key1 + "/" + key2, file1.variables["lat"][:],
+                                              file2.variables["lat"][:])
+                        self.__check_compat_a("Time values " + key1 + "/" + key2, file1.variables["time"][:],
+                                              file2.variables["time"][:])
+                        file2.close()
+                        checked.append(check_i)
+            file1.close()
+        for key in keys:
+            self.__checked_data.append(key)
+        print("IO: Checked data compat")
+
+    def import_data_const(self, data: dict):
+        print("IO: import const")
+        if not self.__checked_const:
+            print("IO: Const not checked")
+            sys.exit(0)
+
         f_tmp = netCDF4.Dataset(data["tmp"])
-        f_pre = netCDF4.Dataset(data["pre"])
-
-        print(f_tmp.variables.keys())
-        print(f_pre.variables.keys())
-
-        print("IO: Check compat")
-        self.__check_compat("Variables", len(f_tmp.variables.keys()), len(f_pre.variables.keys()))
-        self.__check_compat("Longitude", f_tmp.variables["lon"][:].size, f_pre.variables["lon"][:].size)
-        self.__check_compat("Latitude", f_tmp.variables["lat"][:].size, f_pre.variables["lat"][:].size)
-        self.__check_compat("Time", f_tmp.variables["time"][:].size, f_pre.variables["time"][:].size)
-        # longest \/ only for climate and wet bulb
-        self.__check_compat("Data", f_tmp.variables["tmp"][:, :, :].size, f_pre.variables["pre"][:, :, :].size)
-        self.__check_compat("Stations", f_tmp.variables["stn"][:, :, :].size, f_pre.variables["stn"][:, :, :].size)
-        self.__check_compat_a("Longitude values", f_tmp.variables["lon"][:], f_pre.variables["lon"][:])
-        self.__check_compat_a("Latitude values", f_tmp.variables["lat"][:], f_pre.variables["lat"][:])
-        self.__check_compat_a("Time values", f_tmp.variables["time"][:], f_pre.variables["time"][:])
-
-        f_tmp.close()
-        f_pre.close()
-        print("IO: Compat checked")
-
-    # TODO Multiple import funct for each data
-    def import_data(self, data: dict):
-        print("IO: import data")
-        f_tmp = netCDF4.Dataset(data["tmp"])
-        f_pre = netCDF4.Dataset(data["pre"])
-
         self.__const["len"] = dict()
-        self.__const["len"]["years"] = int(len(f_tmp.variables["time"][:]))/12
+        self.__const["len"]["years"] = int(len(f_tmp.variables["time"][:])) / 12
         self.__const["len"]["months"] = int(len(f_tmp.variables["time"][:]))
         self.__const["len"]["lat"] = int(len(f_tmp.variables["lat"][:]))
         self.__const["len"]["lon"] = int(len(f_tmp.variables["lon"][:]))
@@ -57,67 +94,60 @@ class IOInterface:
         self.__const["data"]["time"] = np.copy(f_tmp.variables["time"][:])
         self.__const["data"]["lat"] = np.copy(f_tmp.variables["lat"][:])
         self.__const["data"]["lon"] = np.copy(f_tmp.variables["lon"][:])
+        self.__imported_const = True
+
+    # TODO Multiple import funct for each data
+    def import_data(self, data: dict, keys: list):
+        print("IO: import data")
+        if not self.__checked_const:
+            print("IO: Const not checked")
+            sys.exit(0)
+        if not self.__imported_const:
+            print("IO: Const not imported")
+            sys.exit(0)
+        if len(self.__checked_data) == 0:
+            print("IO: Data not checked")
+            sys.exit(0)
+        for key in keys:
+            if key not in self.__checked_data:
+                print("IO: {} not checked".format(key))
+                sys.exit(0)
+
+        files = dict()
+        for key in keys:
+            files[key] = netCDF4.Dataset(data[key])
 
         start_date = datetime(1900, 1, 1, 0, 0)
-        time_len = int(len(f_tmp.variables["time"][:]))
+        time_len = self.__const["len"]["months"]
         for time_index in range(time_len):
             print("IO: Import {0:.2f}%".format((time_index / time_len) * 100))
-            days_since = int(f_tmp.variables["time"][time_index])
+            days_since = int(self.__const["data"]["time"][time_index])
             current_date = start_date + timedelta(days=days_since)
             year = current_date.year
             month = current_date.month
             if year not in self.__data.keys():
                 self.__data[year] = dict()
             self.__data[year][month] = dict()
-            self.__data[year][month]["tmp"] = np.ma.copy(f_tmp.variables["tmp"][time_index, :, :])
-            self.__data[year][month]["pre"] = np.ma.copy(f_pre.variables["pre"][time_index, :, :])
-            # self.__data[year][month]["tmp-stn"] = np.ma.copy(f_tmp.variables["stn"][time_index, :, :])
-            # self.__data[year][month]["pre-stn"] = np.ma.copy(f_pre.variables["stn"][time_index, :, :])
-        f_tmp.close()
-        f_pre.close()
-        self.__data_imported = True
+            for key, file in files.items():
+                self.__data[year][month][key] = np.ma.copy(file.variables[key][time_index, :, :])
+                # self.__data[year][month][key + "-stn"] = np.ma.copy(file.variables["stn"][time_index, :, :])
+        for key, file in files.items():
+            self.__imported_data.append(key)
+            file.close()
         print("IO: data imported")
 
-    # @staticmethod
-    # def export_data_open(out_dir, file):
-    #     path = out_dir + "/" + file + ".json"
-    #     if not os.path.exists(out_dir):
-    #         os.mkdir(out_dir)
-    #     f = open(path, "a")
-    #     f.write("{")
-    #     f.close()
-    #     print("IO: file {} opened".format(file))
+    def reset_data(self):
+        self.__data.clear()
+        self.__checked_data.clear()
+        self.__imported_data.clear()
 
-    # @staticmethod
-    # def export_data_save(out_dir, file, year, data):
-    #     path = out_dir + "/" + file + ".json"
-    #     if not os.path.exists(out_dir):
-    #         os.mkdir(out_dir)
-    #     data_json = json.dumps(data, indent=4)
-    #     f = open(path, "a")
-    #     f.write('"' + str(year) + '" : ')
-    #     f.write(data_json)
-    #     f.close()
-    #     print("IO: file {} saved".format(file))
-
-    # @staticmethod
-    # def export_data_comma(out_dir, file):
-    #     path = out_dir + "/" + file + ".json"
-    #     if not os.path.exists(out_dir):
-    #         os.mkdir(out_dir)
-    #     f = open(path, "a")
-    #     f.write(",")
-    #     f.close()
-
-    # @staticmethod
-    # def export_data_close(out_dir, file):
-    #     path = out_dir + "/" + file + ".json"
-    #     if not os.path.exists(out_dir):
-    #         os.mkdir(out_dir)
-    #     f = open(path, "a")
-    #     f.write("}")
-    #     f.close()
-    #     print("IO: file {} closed".format(file))
+    def reset_all(self):
+        self.__data.clear()
+        self.__const.clear()
+        self.__checked_const = False
+        self.__checked_data.clear()
+        self.__imported_const = False
+        self.__imported_data.clear()
 
     @staticmethod
     def __check_compat(name: str, var1, var2):
@@ -130,10 +160,10 @@ class IOInterface:
     @staticmethod
     def __check_compat_a(name: str, var1, var2):
         if not np.array_equal(var1, var2):
-            print("IO: Data not compatible: {}".format(name))
+            print("IO: Data array not compatible: {}".format(name))
             sys.exit(0)
         else:
-            print("IO: Data compatible: {}".format(name))
+            print("IO: Data array compatible: {}".format(name))
 
     def get_data_size(self):
         return len(self.__data)
@@ -160,20 +190,47 @@ class IOInterface:
     def get_lon_len(self):
         return self.__const["len"]["lon"]
 
-    def get_year_data(self, name: str, year: int, lat_index: int, lon_index: int):
+    def get_month_data(self, key: str, year: int, month: int, lat_index: int, lon_index: int):
+        if not self.__imported_const:
+            print("IO: Const not imported")
+            sys.exit(0)
+        if key not in self.__imported_data:
+            print("IO: {} not imported".format(key))
+            sys.exit(0)
+
+        data = self.__data[year][month][key][lat_index][lon_index]
+        if np.ma.is_masked(data):
+            return None
+        return float(data)
+
+    # If error, maybe here
+    # In the loop, maybe the funct doesn't erase data with none
+    def get_year_data(self, key: str, year: int, lat_index: int, lon_index: int) -> list:
+        if not self.__imported_const:
+            print("IO: Const not imported")
+            sys.exit(0)
+        if key not in self.__imported_data:
+            print("IO: {} not imported".format(key))
+            sys.exit(0)
+
         data_year = list()
-        for i in range(1, 13):
-            data = self.__data[year][i][name][lat_index][lon_index]
-            if np.ma.is_masked(data):
+        for month in range(1, 13):
+            data = self.get_month_data(key, year, month, lat_index, lon_index)
+            if data is None:
                 return []
             else:
-                data_year.append(float(self.__data[year][i][name][lat_index][lon_index]))
+                data_year.append(float(data))
+            del data
         return data_year
 
     # TODO adapt export to GEOJson
     @staticmethod
     def export_data(out_dir, file, coords: list, props: dict):
         print("export")
+
+    # TODO export to mongoDB
+    def export_data_cloud(self):
+        print("export to cloud")
 
     def tests(self):
         print("IO: test")
