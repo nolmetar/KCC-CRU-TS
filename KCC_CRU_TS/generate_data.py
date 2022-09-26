@@ -13,7 +13,8 @@ DATA = {
     "tmn": "DATA/cru_ts4.06.1901.2021.tmn.dat.nc",
     "tmx": "DATA/cru_ts4.06.1901.2021.tmx.dat.nc",
     "vap": "DATA/cru_ts4.06.1901.2021.vap.dat.nc",
-    "wet": "DATA/cru_ts4.06.1901.2021.wet.dat.nc"
+    "wet": "DATA/cru_ts4.06.1901.2021.wet.dat.nc",
+    "frs": "DATA/cru_ts4.06.1901.2021.frs.dat.nc"
 }
 OUTPUT_DIR = "OUTPUT"
 
