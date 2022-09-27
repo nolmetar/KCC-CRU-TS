@@ -5,7 +5,7 @@ from .generate_data import GenerateData
 from .generate_maps import GenerateMaps
 
 
-# !! WARNING Af IS EQUAL TO z !!
+# !! WARNING Af IS EQUAL TO Az !!
 # TODO finish that menu
 def main() -> None:
     start_time = time.time()

@@ -95,6 +95,7 @@ class IOInterface:
         self.__const["data"]["lat"] = np.copy(f_tmp.variables["lat"][:])
         self.__const["data"]["lon"] = np.copy(f_tmp.variables["lon"][:])
         self.__imported_const = True
+        print("IO: const imported")
 
     # TODO Multiple import funct for each data
     def import_data(self, data: dict, keys: list):
@@ -120,7 +121,7 @@ class IOInterface:
         start_date = datetime(1900, 1, 1, 0, 0)
         time_len = self.__const["len"]["months"]
         for time_index in range(time_len):
-            print("IO: Import {0:.2f}%".format((time_index / time_len) * 100))
+            # print("IO: Import {0} {1:.2f}%".format(keys, (time_index / time_len) * 100))
             days_since = int(self.__const["data"]["time"][time_index])
             current_date = start_date + timedelta(days=days_since)
             year = current_date.year
@@ -205,6 +206,7 @@ class IOInterface:
 
     # If error, maybe here
     # In the loop, maybe the funct doesn't erase data with none
+    # added del to prevent this issue
     def get_year_data(self, key: str, year: int, lat_index: int, lon_index: int) -> list:
         if not self.__imported_const:
             print("IO: Const not imported")
@@ -225,8 +227,13 @@ class IOInterface:
 
     # TODO adapt export to GEOJson
     @staticmethod
-    def export_data(out_dir, file, coords: list, props: dict):
-        print("export")
+    def export_data(out_dir, year, coords: list, props: dict):
+        path = out_dir + str(year) + "-" + str(coords[0]) + "-" + str(coords[1]) + ".json"
+        if not os.path.exists(out_dir):
+            os.mkdir(out_dir)
+        data_json = json.dumps(props, indent=4)
+        with open(path, "a") as f:
+            f.write(data_json)
 
     # TODO export to mongoDB
     def export_data_cloud(self):

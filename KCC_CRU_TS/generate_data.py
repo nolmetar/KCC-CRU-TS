@@ -16,7 +16,13 @@ DATA = {
     "wet": "DATA/cru_ts4.06.1901.2021.wet.dat.nc",
     "frs": "DATA/cru_ts4.06.1901.2021.frs.dat.nc"
 }
-OUTPUT_DIR = "OUTPUT"
+# Cloud: Collection params
+OUTPUT_DIR_JSON_PARAM = "OUTPUT/JSON-PARAMS/"
+# Cloud: Collection data
+# One collection per year or one coll per data ?
+# Every variable
+OUTPUT_DIR_JSON_DATA = "OUTPUT/JSON-DATA/"
+OUTPUT_DIR_MAPS = "OUTPUT/MAPS/"
 
 
 class GenerateData:
@@ -25,38 +31,41 @@ class GenerateData:
         self.io = IOInterface()
         self.co = Compute()
         self.ko = Koppen()
-        self.io.check_const(DATA)
-        self.io.import_data_const(DATA)
 
     # TODO main loop goes here
     def generate_data(self, preview: bool):
+        print("Generate Data: Starting data generation")
+        self.io.check_const(DATA)
+        self.io.import_data_const(DATA)
+
+        self.__generate_parameters(preview)
+
         self.__generate_climates(preview)
+        self.__generate_min_temperatures(preview)
+        self.__generate_avg_temperatures(preview)
+        self.__generate_max_temperatures(preview)
+        self.__generate_precipitation(preview)
+        self.__generate_min_wet_bulb(preview)
+        self.__generate_avg_wet_bulb(preview)
+        self.__generate_max_wet_bulb(preview)
+        self.__generate_cloud_cover(preview)
+        self.__generate_wet_days(preview)
+        self.__generate_frost_days(preview)
 
-        # self.__generate_climates(preview)
+        print("Generate Data: Finished data generation")
 
-        # self.io.import_data(DATA)
-
-        # lat_len = self.io.get_lat_len()
-        # lon_len = self.io.get_lon_len()
-        # years = []
-        # if preview:
-        #     years = [2021]
-        # else:
-        #     years = self.io.get_years()
-        #
-        # for year in years:
-        #     print("Generate Data: Generating {0:.2f}%".format((years.index(year) / len(years)) * 100))
-        #     for lat in range(lat_len):
-        #         for lon in range(lon_len):
-        #             a = 1
+    # { "type":"time", "data":[2021, 2020, 2019, ...] }
+    # { "type":"area", "data":{ area id, real lat lon, rectangle } }
+    # { "type":"koppen", "data":{ code name, class/full name, colors } }
+    def __generate_parameters(self, preview: bool):
+        return
 
     # TODO one funct for each data: climate, temp, pre, wet bulb, etc
-    # TODO remove loop
     def __generate_climates(self, preview: bool):
+        print("Generate Data: Starting climate generation")
         self.io.check_data(DATA, ["tmp", "pre"])
         self.io.import_data(DATA, ["tmp", "pre"])
 
-        print("Generate Data: Starting climate generation")
         lat_len = self.io.get_lat_len()
         lon_len = self.io.get_lon_len()
         if preview:
@@ -64,7 +73,7 @@ class GenerateData:
         else:
             years = self.io.get_years()
         for year in years:
-            print("Generate Data: Generating {0:.2f}%".format((years.index(year) / len(years)) * 100))
+            print("Generate Data: Generating climates {0:.2f}%".format((years.index(year) / len(years)) * 100))
             data_output = list()
             for lat in range(lat_len):
                 for lon in range(lon_len):
@@ -87,10 +96,89 @@ class GenerateData:
                         data_lat_lon["data"]["fullname"] = self.ko.get_fullname(symbols)
                         data_lat_lon["data"]["color"] = self.ko.get_color(symbols)
                     data_output.append(data_lat_lon)
-                # break
             print(len(data_output))
             for i in range(0, 20):
-                print(data_output[random.randint(0, 259199)])
-            # self.io.export_data_save(OUTPUT_DIR, file_name, year, data_output)
+                rand_int = random.randint(0, 259199)
+                print(data_output[rand_int])
         self.io.reset_data()
-        print("Generate Data: Finished generation")
+        print("Generate Data: Finished climate generation")
+
+    def __generate_min_temperatures(self, preview: bool):
+        print("Generate Data: Starting min temp generation")
+        self.io.check_data(DATA, ["tmn"])
+        self.io.import_data(DATA, ["tmn"])
+
+        self.io.reset_data()
+        print("Generate Data: Finished min temp generation")
+
+    def __generate_avg_temperatures(self, preview: bool):
+        print("Generate Data: Starting avg temp generation")
+        self.io.check_data(DATA, ["tmp"])
+        self.io.import_data(DATA, ["tmp"])
+
+        self.io.reset_data()
+        print("Generate Data: Finished avg temp generation")
+
+    def __generate_max_temperatures(self, preview: bool):
+        print("Generate Data: Starting max temp generation")
+        self.io.check_data(DATA, ["tmx"])
+        self.io.import_data(DATA, ["tmx"])
+
+        self.io.reset_data()
+        print("Generate Data: Finished max temp generation")
+
+    def __generate_precipitation(self, preview: bool):
+        print("Generate Data: Starting precipitation generation")
+        self.io.check_data(DATA, ["pre"])
+        self.io.import_data(DATA, ["pre"])
+
+        self.io.reset_data()
+        print("Generate Data: Finished precipitation generation")
+
+    def __generate_min_wet_bulb(self, preview: bool):
+        print("Generate Data: Starting min wet bulb generation")
+        self.io.check_data(DATA, ["tmn", "vap"])
+        self.io.import_data(DATA, ["tmn", "vap"])
+
+        self.io.reset_data()
+        print("Generate Data: Finished min wet bulb generation")
+
+    def __generate_avg_wet_bulb(self, preview: bool):
+        print("Generate Data: Starting avg wet bulb generation")
+        self.io.check_data(DATA, ["tmp", "vap"])
+        self.io.import_data(DATA, ["tmp", "vap"])
+
+        self.io.reset_data()
+        print("Generate Data: Finished avg wet bulb generation")
+
+    def __generate_max_wet_bulb(self, preview: bool):
+        print("Generate Data: Starting max wet bulb generation")
+        self.io.check_data(DATA, ["tmx", "vap"])
+        self.io.import_data(DATA, ["tmx", "vap"])
+
+        self.io.reset_data()
+        print("Generate Data: Finished max wet bulb generation")
+
+    def __generate_cloud_cover(self, preview: bool):
+        print("Generate Data: Starting cloud cover generation")
+        self.io.check_data(DATA, ["cld"])
+        self.io.import_data(DATA, ["cld"])
+
+        self.io.reset_data()
+        print("Generate Data: Finished cloud cover generation")
+
+    def __generate_wet_days(self, preview: bool):
+        print("Generate Data: Starting wet days generation")
+        self.io.check_data(DATA, ["wet"])
+        self.io.import_data(DATA, ["wet"])
+
+        self.io.reset_data()
+        print("Generate Data: Finished wet days generation")
+
+    def __generate_frost_days(self, preview: bool):
+        print("Generate Data: Starting frost days generation")
+        self.io.check_data(DATA, ["frs"])
+        self.io.import_data(DATA, ["frs"])
+
+        self.io.reset_data()
+        print("Generate Data: Finished frost days generation")
