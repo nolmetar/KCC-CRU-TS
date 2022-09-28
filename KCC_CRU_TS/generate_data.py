@@ -5,6 +5,7 @@ import random
 from .io_interface import IOInterface
 from .compute import Compute
 from .koppen import Koppen
+from .generate_maps import GenerateMaps
 
 DATA = {
     "tmp": "DATA/cru_ts4.06.1901.2021.tmp.dat.nc",
@@ -31,6 +32,8 @@ class GenerateData:
         self.io = IOInterface()
         self.co = Compute()
         self.ko = Koppen()
+        self.gm = GenerateMaps()
+        self.gm.tests()
 
     # TODO main loop goes here
     def generate_data(self, preview: bool, cloud: bool):

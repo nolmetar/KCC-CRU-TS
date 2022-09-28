@@ -2,6 +2,9 @@
 import cartopy.crs as ccrs
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
+from matplotlib.patches import Rectangle
+import cartopy.feature as c_feature
+import random
 
 
 class GenerateMaps:
@@ -13,21 +16,26 @@ class GenerateMaps:
     def tests():
         print("Generate Maps: tests")
 
-        ax = plt.axes(projection=ccrs.PlateCarree())
-        ax.coastlines()
+        fig = plt.figure(figsize=(16, 12))
+        chart = fig.add_subplot(projection=ccrs.PlateCarree())
 
-        ny_lon, ny_lat = -75, 43
-        delhi_lon, delhi_lat = 77.23, 28.61
+        chart.set_extent([-180, 180, -90, 90], ccrs.PlateCarree())
+        chart.add_feature(c_feature.LAND)
+        chart.add_feature(c_feature.OCEAN)
+        chart.add_feature(c_feature.COASTLINE)
+        # chart.add_feature(c_feature.BORDERS, linestyle='-', linewidth=0.5)
 
-        plt.plot([ny_lon, delhi_lon], [ny_lat, delhi_lat],
-                 color='gray', linestyle='--',
-                 transform=ccrs.PlateCarree(),
-                 )
+        chart.scatter(5, 50, color="blue", transform=ccrs.PlateCarree())
 
-        # plt.plot([-16.5, -16.0, -16.0, -16.5, -16.5], [-44.0, -44.0, -43.5, -43.5, -44.0],
-        #         transform=ccrs.PlateCarree(),
-        # )
+        for i in range(-90, 90, 2):
+            for j in range(-180, 180, 2):
+                color = "#%06x" % random.randint(0, 0xFFFFFF)
+                patch = Rectangle((j, i), 2, 2)
+                patch.set_facecolor(color)
+                patch.set_alpha(1)
+                chart.add_patch(patch)
 
-        plt.savefig('coastlines.png')
+        chart.add_feature(c_feature.BORDERS, linestyle='-', linewidth=0.5)
 
+        plt.savefig('test.jpg', bbox_inches='tight')
         plt.show()

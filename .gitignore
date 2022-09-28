@@ -9,5 +9,8 @@ __pycache__
 KCC_CRU_TS/__pycache__
 notes.py
 example_output.json
+*.png
+*.jpg
+*.jpeg
 
 # End of Nolmetar
