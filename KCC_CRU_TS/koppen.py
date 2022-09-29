@@ -62,6 +62,40 @@ class Koppen:
             "EF": "Ice cap",
             "H": "Highland"
         }
+        self.KOPPEN_INDEX = {
+            "Az": 0,
+            "Am": 1,
+            "As": 2,
+            "Aw": 3,
+            "BWh": 4,
+            "BWk": 5,
+            "BSh": 6,
+            "BSk": 7,
+            "Csa": 8,
+            "Csb": 9,
+            "Csc": 10,
+            "Cwa": 11,
+            "Cwb": 12,
+            "Cwc": 13,
+            "Cfa": 14,
+            "Cfb": 15,
+            "Cfc": 16,
+            "Dsa": 17,
+            "Dsb": 18,
+            "Dsc": 19,
+            "Dsd": 20,
+            "Dwa": 21,
+            "Dwb": 22,
+            "Dwc": 23,
+            "Dwd": 24,
+            "Dfa": 25,
+            "Dfb": 26,
+            "Dfc": 27,
+            "Dfd": 28,
+            "ET": 29,
+            "EF": 30,
+            "H": 31
+        }
         self.KOPPEN_COLOR = {
             "Az": "#0000FF",
             "Am": "#0077FF",
@@ -104,18 +138,27 @@ class Koppen:
                 classname += self.KOPPEN_CLASS_NAME[symbol] + " "
         return classname
 
-    def get_fullname(self, symbols):
+    def get_fullname(self, symbols: list):
         joined_symbols = "".join(symbols)
         fullname = ""
         if joined_symbols in self.KOPPEN_FULL_NAME.keys():
             fullname = self.KOPPEN_FULL_NAME[joined_symbols]
         return fullname
 
-    def get_color(self, symbols):
+    def get_index(self, symbols: list):
         joined_symbols = "".join(symbols)
+        return self.KOPPEN_INDEX[joined_symbols]
+
+    def get_index_rev(self, index: int):
+        for key, value in self.KOPPEN_INDEX.items():
+            if value == index:
+                return key
+        return ""
+
+    def get_color(self, symbols):
         color = ""
-        if joined_symbols in self.KOPPEN_COLOR.keys():
-            color = self.KOPPEN_COLOR[joined_symbols]
+        if symbols in self.KOPPEN_COLOR.keys():
+            color = self.KOPPEN_COLOR[symbols]
         return color
 
     def compute_symbols(self, tmp: list, pre: list, lat):

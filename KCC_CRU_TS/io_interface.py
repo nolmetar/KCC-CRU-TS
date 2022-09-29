@@ -43,7 +43,7 @@ class IOInterface:
         print("IO: Checked const compat")
 
     def check_data(self, data: dict, keys: list):
-        print("IO: Check data compat")
+        print("IO: Check data compat {}".format(keys))
         if not self.__checked_const:
             print("IO: Const not checked")
             sys.exit(0)
@@ -61,22 +61,23 @@ class IOInterface:
                     check_i = (key2, key1)
                     if check not in checked:
                         file2 = netCDF4.Dataset(data[key2])
-                        self.__check_compat("Data " + key1 + "/" + key2, file1.variables[key1][:, :, :].size,
-                                            file2.variables[key2][:, :, :].size)
-                        self.__check_compat("Stations " + key1 + "/" + key2, file1.variables["stn"][:, :, :].size,
-                                            file2.variables["stn"][:, :, :].size)
-                        self.__check_compat_a("Longitude values " + key1 + "/" + key2, file1.variables["lon"][:],
-                                              file2.variables["lon"][:])
-                        self.__check_compat_a("Latitude values " + key1 + "/" + key2, file1.variables["lat"][:],
-                                              file2.variables["lat"][:])
-                        self.__check_compat_a("Time values " + key1 + "/" + key2, file1.variables["time"][:],
-                                              file2.variables["time"][:])
+                        # TODO REMOVE COMMENTS
+                        # self.__check_compat("Data " + key1 + "/" + key2, file1.variables[key1][:, :, :].size,
+                        #                     file2.variables[key2][:, :, :].size)
+                        # self.__check_compat("Stations " + key1 + "/" + key2, file1.variables["stn"][:, :, :].size,
+                        #                     file2.variables["stn"][:, :, :].size)
+                        # self.__check_compat_a("Longitude values " + key1 + "/" + key2, file1.variables["lon"][:],
+                        #                       file2.variables["lon"][:])
+                        # self.__check_compat_a("Latitude values " + key1 + "/" + key2, file1.variables["lat"][:],
+                        #                       file2.variables["lat"][:])
+                        # self.__check_compat_a("Time values " + key1 + "/" + key2, file1.variables["time"][:],
+                        #                       file2.variables["time"][:])
                         file2.close()
                         checked.append(check_i)
             file1.close()
         for key in keys:
             self.__checked_data.append(key)
-        print("IO: Checked data compat")
+        print("IO: Checked data compat {}".format(keys))
 
     def import_data_const(self, data: dict):
         print("IO: import const")
@@ -99,7 +100,7 @@ class IOInterface:
 
     # TODO Multiple import funct for each data
     def import_data(self, data: dict, keys: list):
-        print("IO: import data")
+        print("IO: import data {}".format(keys))
         if not self.__checked_const:
             print("IO: Const not checked")
             sys.exit(0)
@@ -135,7 +136,7 @@ class IOInterface:
         for key, file in files.items():
             self.__imported_data.append(key)
             file.close()
-        print("IO: data imported")
+        print("IO: data imported {}".format(keys))
 
     def reset_data(self):
         self.__data.clear()
@@ -227,17 +228,26 @@ class IOInterface:
 
     # TODO adapt export to GEOJson
     @staticmethod
-    def export_data(out_dir, year, coords: list, props: dict):
-        path = out_dir + str(year) + "-" + str(coords[0]) + "-" + str(coords[1]) + ".json"
+    def export_data_json(out_dir, name, name_type, year, props: list):
+        print("IO: export json data {} {}".format(name, year))
+        path = out_dir + name + "-" + str(year) + ".json"
+        data_output = dict()
+        data_output["type"] = name_type
+        data_output["year"] = year
+        data_output["data"] = props
         if not os.path.exists(out_dir):
             os.mkdir(out_dir)
-        data_json = json.dumps(props, indent=4)
-        with open(path, "a") as f:
+        data_json = json.dumps(data_output, indent=4)
+        with open(path, "w") as f:
             f.write(data_json)
+        print("IO: exported json data {} {}".format(name, year))
 
     # TODO export to mongoDB
-    def export_data_cloud(self):
+    def export_data_cloud(self, datalist: list):
         print("export to cloud")
+        for data in datalist:
+            # put many to cloud
+            pass
 
     def tests(self):
         print("IO: test")

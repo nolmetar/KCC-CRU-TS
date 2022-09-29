@@ -43,3 +43,5 @@ def main() -> None:
     print("Main: Time elapsed : {0:.2f} seconds".format(time_elapsed_s))
     time_elapsed_m = time_elapsed_s / 60
     print("Main: Or {0:.2f} minutes".format(time_elapsed_m))
+    time_elapsed_h = time_elapsed_m / 60
+    print("Main: Or {0:.2f} hours".format(time_elapsed_h))
