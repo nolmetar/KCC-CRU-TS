@@ -5,7 +5,6 @@ from .generate_data import GenerateData
 
 
 # !! WARNING Af IS EQUAL TO Az !!
-# TODO finish that menu
 def main() -> None:
     start_time = time.time()
     print("Main: Start program")

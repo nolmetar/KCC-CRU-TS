@@ -98,7 +98,6 @@ class IOInterface:
         self.__imported_const = True
         print("IO: const imported")
 
-    # TODO Multiple import funct for each data
     def import_data(self, data: dict, keys: list):
         print("IO: import data {}".format(keys))
         if not self.__checked_const:
@@ -226,11 +225,10 @@ class IOInterface:
             del data
         return data_year
 
-    # TODO adapt export to GEOJson
     @staticmethod
     def export_data_json(out_dir, name, name_type, year, props: list):
-        print("IO: export json data {} {}".format(name, year))
-        path = out_dir + name + "-" + str(year) + ".json"
+        path = out_dir + str(year) + "-" + str(name_type) + "-" + name + ".json"
+        print("IO: export json data : {}".format(path))
         data_output = dict()
         data_output["type"] = name_type
         data_output["year"] = year
@@ -240,10 +238,11 @@ class IOInterface:
         data_json = json.dumps(data_output, indent=4)
         with open(path, "w") as f:
             f.write(data_json)
-        print("IO: exported json data {} {}".format(name, year))
+        print("IO: exported json data : {}".format(path))
 
     # TODO export to mongoDB
-    def export_data_cloud(self, datalist: list):
+    @staticmethod
+    def export_data_cloud(datalist: list):
         print("export to cloud")
         for data in datalist:
             # put many to cloud

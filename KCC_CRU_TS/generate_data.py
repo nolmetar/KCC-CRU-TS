@@ -1,5 +1,4 @@
 #!python3
-import random
 
 from .io_interface import IOInterface
 from .compute import Compute
@@ -16,11 +15,6 @@ DATA = {
     "vap": "DATA/cru_ts4.06.1901.2021.vap.dat.nc",
     "wet": "DATA/cru_ts4.06.1901.2021.wet.dat.nc",
     "frs": "DATA/cru_ts4.06.1901.2021.frs.dat.nc"
-}
-
-DATA_TO_GEN = {
-    "climate": ["tmp", "pre"],
-    "min temp": ["tmn"]
 }
 
 # Cloud: Collection params
@@ -41,7 +35,6 @@ class GenerateData:
         self.gm = GenerateMaps()
         self.wb = WetBulb()
 
-    # TODO main loop goes here
     def generate_data(self, preview: bool, cloud: bool):
         print("Generate Data: Starting data generation")
         self.io.check_const(DATA)
@@ -69,6 +62,14 @@ class GenerateData:
 
         print("Generate Data: Finished data generation")
 
+    @staticmethod
+    def __generate_payload(lat, lon, payload: float):
+        data = dict()
+        data["l"] = lat
+        data["o"] = lon
+        data["p"] = payload
+        return data
+
     # { "type":"time", "data":[2021, 2020, 2019, ...] }
     # { "type":"area", "data":{ area id, real lat lon, rectangle } }
     # { "type":"koppen", "data":{ code name, class/full name, colors } }
@@ -85,7 +86,7 @@ class GenerateData:
 
         print("Generate Data: Finished parameters generation")
 
-    # TODO one funct for each data: climate, temp, pre, wet bulb, etc
+    # climates per year
     def __generate_climates(self, cloud: bool, lat_len, lon_len, years: list):
         print("Generate Data: Starting climate generation")
         self.io.check_data(DATA, ["tmp", "pre"])
@@ -100,14 +101,11 @@ class GenerateData:
                     year_data_tmp = self.io.get_year_data("tmp", year, lat, lon)
                     year_data_pre = self.io.get_year_data("pre", year, lat, lon)
                     if len(year_data_tmp) != 0 and len(year_data_pre) != 0:
-                        data_lat_lon = dict()
                         symbols = self.ko.compute_symbols(year_data_tmp, year_data_pre, real_lat)
-                        data_lat_lon["l"] = lat
-                        data_lat_lon["o"] = lon
-                        data_lat_lon["p"] = self.ko.get_index(symbols)
+                        data_lat_lon = self.__generate_payload(lat, lon, self.ko.get_index(symbols))
                         data_output.append(data_lat_lon)
                         del data_lat_lon
-            self.gm.generate_map(OUTPUT_DIR_MAPS, "climate", year, data_output)
+            # self.gm.generate_map_climates(OUTPUT_DIR_MAPS, year, data_output)
             if cloud:
                 self.io.export_data_cloud(data_output)
             else:
@@ -117,6 +115,7 @@ class GenerateData:
         self.io.reset_data()
         print("Generate Data: Finished climate generation")
 
+    # min temp per year
     def __generate_min_temperatures(self, cloud: bool, lat_len, lon_len, years: list):
         print("Generate Data: Starting min temp generation")
         self.io.check_data(DATA, ["tmn"])
@@ -128,10 +127,20 @@ class GenerateData:
             for lat in range(lat_len):
                 for lon in range(lon_len):
                     year_data_tmn = self.io.get_year_data("tmn", year, lat, lon)
+                    if len(year_data_tmn) != 0:
+                        data_lat_lon = self.__generate_payload(lat, lon, round(min(year_data_tmn), 2))
+                        data_output.append(data_lat_lon)
+                        del data_lat_lon
+            if cloud:
+                self.io.export_data_cloud(data_output)
+            else:
+                self.io.export_data_json(OUTPUT_DIR_JSON_DATA, "temperature_min", 2, year, data_output)
+            del data_output
 
         self.io.reset_data()
         print("Generate Data: Finished min temp generation")
 
+    # avg temp per year
     def __generate_avg_temperatures(self, cloud: bool, lat_len, lon_len, years: list):
         print("Generate Data: Starting avg temp generation")
         self.io.check_data(DATA, ["tmp"])
@@ -143,10 +152,21 @@ class GenerateData:
             for lat in range(lat_len):
                 for lon in range(lon_len):
                     year_data_tmp = self.io.get_year_data("tmp", year, lat, lon)
+                    if len(year_data_tmp) != 0:
+                        average = sum(year_data_tmp) / len(year_data_tmp)
+                        data_lat_lon = self.__generate_payload(lat, lon, round(average, 2))
+                        data_output.append(data_lat_lon)
+                        del data_lat_lon
+            if cloud:
+                self.io.export_data_cloud(data_output)
+            else:
+                self.io.export_data_json(OUTPUT_DIR_JSON_DATA, "temperature_avg", 3, year, data_output)
+            del data_output
 
         self.io.reset_data()
         print("Generate Data: Finished avg temp generation")
 
+    # max temp per year
     def __generate_max_temperatures(self, cloud: bool, lat_len, lon_len, years: list):
         print("Generate Data: Starting max temp generation")
         self.io.check_data(DATA, ["tmx"])
@@ -158,10 +178,20 @@ class GenerateData:
             for lat in range(lat_len):
                 for lon in range(lon_len):
                     year_data_tmx = self.io.get_year_data("tmx", year, lat, lon)
+                    if len(year_data_tmx) != 0:
+                        data_lat_lon = self.__generate_payload(lat, lon, round(max(year_data_tmx), 2))
+                        data_output.append(data_lat_lon)
+                        del data_lat_lon
+            if cloud:
+                self.io.export_data_cloud(data_output)
+            else:
+                self.io.export_data_json(OUTPUT_DIR_JSON_DATA, "temperature_max", 4, year, data_output)
+            del data_output
 
         self.io.reset_data()
         print("Generate Data: Finished max temp generation")
 
+    # min, avg, max, sum precipitations per year
     def __generate_precipitation(self, cloud: bool, lat_len, lon_len, years: list):
         print("Generate Data: Starting precipitation generation")
         self.io.check_data(DATA, ["pre"])
@@ -169,14 +199,46 @@ class GenerateData:
 
         for year in years:
             print("Generate Data: Generating precipitation {0:.2f}%".format((years.index(year) / len(years)) * 100))
-            data_output = list()
+            data_output_min = list()
+            data_output_avg = list()
+            data_output_max = list()
+            data_output_sum = list()
             for lat in range(lat_len):
                 for lon in range(lon_len):
                     year_data_pre = self.io.get_year_data("pre", year, lat, lon)
+                    if len(year_data_pre) != 0:
+                        data_lat_lon_min = self.__generate_payload(lat, lon, round(min(year_data_pre), 2))
+                        data_output_min.append(data_lat_lon_min)
+                        del data_lat_lon_min
+                        average = sum(year_data_pre) / len(year_data_pre)
+                        data_lat_lon_avg = self.__generate_payload(lat, lon, round(average, 2))
+                        data_output_avg.append(data_lat_lon_avg)
+                        del data_lat_lon_avg
+                        data_lat_lon_max = self.__generate_payload(lat, lon, round(max(year_data_pre), 2))
+                        data_output_max.append(data_lat_lon_max)
+                        del data_lat_lon_max
+                        data_lat_lon_sum = self.__generate_payload(lat, lon, round(sum(year_data_pre), 2))
+                        data_output_sum.append(data_lat_lon_sum)
+                        del data_lat_lon_sum
+            if cloud:
+                self.io.export_data_cloud(data_output_min)
+                self.io.export_data_cloud(data_output_avg)
+                self.io.export_data_cloud(data_output_max)
+                self.io.export_data_cloud(data_output_sum)
+            else:
+                self.io.export_data_json(OUTPUT_DIR_JSON_DATA, "precipitation_min", 5, year, data_output_min)
+                self.io.export_data_json(OUTPUT_DIR_JSON_DATA, "precipitation_avg", 6, year, data_output_avg)
+                self.io.export_data_json(OUTPUT_DIR_JSON_DATA, "precipitation_max", 7, year, data_output_max)
+                self.io.export_data_json(OUTPUT_DIR_JSON_DATA, "precipitation_sum", 8, year, data_output_sum)
+            del data_output_min
+            del data_output_avg
+            del data_output_max
+            del data_output_sum
 
         self.io.reset_data()
         print("Generate Data: Finished precipitation generation")
 
+    # min wet bulb per year
     def __generate_min_wet_bulb(self, cloud: bool, lat_len, lon_len, years: list):
         print("Generate Data: Starting min wet bulb generation")
         self.io.check_data(DATA, ["tmn", "vap"])
@@ -193,6 +255,7 @@ class GenerateData:
         self.io.reset_data()
         print("Generate Data: Finished min wet bulb generation")
 
+    # avg wet bulb per year
     def __generate_avg_wet_bulb(self, cloud: bool, lat_len, lon_len, years: list):
         print("Generate Data: Starting avg wet bulb generation")
         self.io.check_data(DATA, ["tmp", "vap"])
@@ -209,6 +272,7 @@ class GenerateData:
         self.io.reset_data()
         print("Generate Data: Finished avg wet bulb generation")
 
+    # max wet bulb per year
     def __generate_max_wet_bulb(self, cloud: bool, lat_len, lon_len, years: list):
         print("Generate Data: Starting max wet bulb generation")
         self.io.check_data(DATA, ["tmx", "vap"])
@@ -225,6 +289,7 @@ class GenerateData:
         self.io.reset_data()
         print("Generate Data: Finished max wet bulb generation")
 
+    # min, avg, max cloud cover per year
     def __generate_cloud_cover(self, cloud: bool, lat_len, lon_len, years: list):
         print("Generate Data: Starting cloud cover generation")
         self.io.check_data(DATA, ["cld"])
@@ -232,14 +297,39 @@ class GenerateData:
 
         for year in years:
             print("Generate Data: Generating cloud cover {0:.2f}%".format((years.index(year) / len(years)) * 100))
-            data_output = list()
+            data_output_min = list()
+            data_output_avg = list()
+            data_output_max = list()
             for lat in range(lat_len):
                 for lon in range(lon_len):
                     year_data_cld = self.io.get_year_data("cld", year, lat, lon)
+                    if len(year_data_cld) != 0:
+                        data_lat_lon_min = self.__generate_payload(lat, lon, round(min(year_data_cld), 2))
+                        data_output_min.append(data_lat_lon_min)
+                        del data_lat_lon_min
+                        average = sum(year_data_cld) / len(year_data_cld)
+                        data_lat_lon_avg = self.__generate_payload(lat, lon, round(average, 2))
+                        data_output_avg.append(data_lat_lon_avg)
+                        del data_lat_lon_avg
+                        data_lat_lon_max = self.__generate_payload(lat, lon, round(max(year_data_cld), 2))
+                        data_output_max.append(data_lat_lon_max)
+                        del data_lat_lon_max
+            if cloud:
+                self.io.export_data_cloud(data_output_min)
+                self.io.export_data_cloud(data_output_avg)
+                self.io.export_data_cloud(data_output_max)
+            else:
+                self.io.export_data_json(OUTPUT_DIR_JSON_DATA, "cloud_cover_min", 12, year, data_output_min)
+                self.io.export_data_json(OUTPUT_DIR_JSON_DATA, "cloud_cover_avg", 13, year, data_output_avg)
+                self.io.export_data_json(OUTPUT_DIR_JSON_DATA, "cloud_cover_max", 14, year, data_output_max)
+            del data_output_min
+            del data_output_avg
+            del data_output_max
 
         self.io.reset_data()
         print("Generate Data: Finished cloud cover generation")
 
+    # avg, min, max, sum wet day per year
     def __generate_wet_days(self, cloud: bool, lat_len, lon_len, years: list):
         print("Generate Data: Starting wet days generation")
         self.io.check_data(DATA, ["wet"])
@@ -247,14 +337,46 @@ class GenerateData:
 
         for year in years:
             print("Generate Data: Generating wet days {0:.2f}%".format((years.index(year) / len(years)) * 100))
-            data_output = list()
+            data_output_min = list()
+            data_output_avg = list()
+            data_output_max = list()
+            data_output_sum = list()
             for lat in range(lat_len):
                 for lon in range(lon_len):
                     year_data_wet = self.io.get_year_data("wet", year, lat, lon)
+                    if len(year_data_wet) != 0:
+                        data_lat_lon_min = self.__generate_payload(lat, lon, round(min(year_data_wet), 2))
+                        data_output_min.append(data_lat_lon_min)
+                        del data_lat_lon_min
+                        average = sum(year_data_wet) / len(year_data_wet)
+                        data_lat_lon_avg = self.__generate_payload(lat, lon, round(average, 2))
+                        data_output_avg.append(data_lat_lon_avg)
+                        del data_lat_lon_avg
+                        data_lat_lon_max = self.__generate_payload(lat, lon, round(max(year_data_wet), 2))
+                        data_output_max.append(data_lat_lon_max)
+                        del data_lat_lon_max
+                        data_lat_lon_sum = self.__generate_payload(lat, lon, round(sum(year_data_wet), 2))
+                        data_output_sum.append(data_lat_lon_sum)
+                        del data_lat_lon_sum
+            if cloud:
+                self.io.export_data_cloud(data_output_min)
+                self.io.export_data_cloud(data_output_avg)
+                self.io.export_data_cloud(data_output_max)
+                self.io.export_data_cloud(data_output_sum)
+            else:
+                self.io.export_data_json(OUTPUT_DIR_JSON_DATA, "wet_days_min", 15, year, data_output_min)
+                self.io.export_data_json(OUTPUT_DIR_JSON_DATA, "wet_days_avg", 16, year, data_output_avg)
+                self.io.export_data_json(OUTPUT_DIR_JSON_DATA, "wet_days_max", 17, year, data_output_max)
+                self.io.export_data_json(OUTPUT_DIR_JSON_DATA, "wet_days_sum", 18, year, data_output_sum)
+            del data_output_min
+            del data_output_avg
+            del data_output_max
+            del data_output_sum
 
         self.io.reset_data()
         print("Generate Data: Finished wet days generation")
 
+    # avg, min, max, sum frost days per year
     def __generate_frost_days(self, cloud: bool, lat_len, lon_len, years: list):
         print("Generate Data: Starting frost days generation")
         self.io.check_data(DATA, ["frs"])
@@ -262,10 +384,41 @@ class GenerateData:
 
         for year in years:
             print("Generate Data: Generating frost days {0:.2f}%".format((years.index(year) / len(years)) * 100))
-            data_output = list()
+            data_output_min = list()
+            data_output_avg = list()
+            data_output_max = list()
+            data_output_sum = list()
             for lat in range(lat_len):
                 for lon in range(lon_len):
                     year_data_frs = self.io.get_year_data("frs", year, lat, lon)
+                    if len(year_data_frs) != 0:
+                        data_lat_lon_min = self.__generate_payload(lat, lon, round(min(year_data_frs), 2))
+                        data_output_min.append(data_lat_lon_min)
+                        del data_lat_lon_min
+                        average = sum(year_data_frs) / len(year_data_frs)
+                        data_lat_lon_avg = self.__generate_payload(lat, lon, round(average, 2))
+                        data_output_avg.append(data_lat_lon_avg)
+                        del data_lat_lon_avg
+                        data_lat_lon_max = self.__generate_payload(lat, lon, round(max(year_data_frs), 2))
+                        data_output_max.append(data_lat_lon_max)
+                        del data_lat_lon_max
+                        data_lat_lon_sum = self.__generate_payload(lat, lon, round(sum(year_data_frs), 2))
+                        data_output_sum.append(data_lat_lon_sum)
+                        del data_lat_lon_sum
+            if cloud:
+                self.io.export_data_cloud(data_output_min)
+                self.io.export_data_cloud(data_output_avg)
+                self.io.export_data_cloud(data_output_max)
+                self.io.export_data_cloud(data_output_sum)
+            else:
+                self.io.export_data_json(OUTPUT_DIR_JSON_DATA, "frost_days_min", 19, year, data_output_min)
+                self.io.export_data_json(OUTPUT_DIR_JSON_DATA, "frost_days_avg", 20, year, data_output_avg)
+                self.io.export_data_json(OUTPUT_DIR_JSON_DATA, "frost_days_max", 21, year, data_output_max)
+                self.io.export_data_json(OUTPUT_DIR_JSON_DATA, "frost_days_sum", 22, year, data_output_sum)
+            del data_output_min
+            del data_output_avg
+            del data_output_max
+            del data_output_sum
 
         self.io.reset_data()
         print("Generate Data: Finished frost days generation")

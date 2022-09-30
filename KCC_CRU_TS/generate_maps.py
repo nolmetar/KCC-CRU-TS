@@ -13,19 +13,15 @@ class GenerateMaps:
         print("Generate Maps: init")
         self.ko = Koppen()
 
-    def generate_map(self, out_dir, name, year, props: list):
-        print("Generate Maps: starting map {} generation".format(name))
+    def generate_map_climates(self, out_dir, year, props: list):
+        print("Generate Maps: starting map climates generation")
         if not os.path.exists(out_dir):
             os.mkdir(out_dir)
-
-        path = out_dir + name + "-" + str(year) + ".jpg"
+        path = out_dir + "climate" + "-" + str(year) + ".jpg"
 
         fig = plt.figure(figsize=(16, 12))
         chart = fig.add_subplot(projection=ccrs.PlateCarree())
-
         chart.set_extent([-180, 180, -90, 90], ccrs.PlateCarree())
-        # chart.add_feature(c_feature.LAND)
-        # chart.add_feature(c_feature.OCEAN)
         chart.add_feature(c_feature.COASTLINE)
 
         for prop in props:
@@ -39,12 +35,9 @@ class GenerateMaps:
             chart.add_patch(patch)
 
         chart.add_feature(c_feature.BORDERS, linestyle='-', linewidth=0.5)
-
         plt.savefig(path, bbox_inches='tight')
-
         print("Generate Maps: finished map {} generation".format(name))
 
-    # TODO figure out how to generate rectangles on map ...
     @staticmethod
     def tests():
         print("Generate Maps: tests")
@@ -56,7 +49,7 @@ class GenerateMaps:
         chart.add_feature(c_feature.LAND)
         chart.add_feature(c_feature.OCEAN)
         chart.add_feature(c_feature.COASTLINE)
-        # chart.add_feature(c_feature.BORDERS, linestyle='-', linewidth=0.5)
+        chart.add_feature(c_feature.BORDERS, linestyle='-', linewidth=0.5)
 
         chart.scatter(5, 50, color="blue", transform=ccrs.PlateCarree())
 
