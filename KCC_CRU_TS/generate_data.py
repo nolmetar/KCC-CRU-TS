@@ -47,18 +47,18 @@ class GenerateData:
         else:
             years = self.io.get_years()
 
-        self.__generate_parameters(cloud, lat_len, lon_len, years)
-        self.__generate_climates(cloud, lat_len, lon_len, years)
-        self.__generate_min_temperatures(cloud, lat_len, lon_len, years)
-        self.__generate_avg_temperatures(cloud, lat_len, lon_len, years)
-        self.__generate_max_temperatures(cloud, lat_len, lon_len, years)
-        self.__generate_precipitation(cloud, lat_len, lon_len, years)
+        # self.__generate_parameters(cloud, lat_len, lon_len, years)
+        # self.__generate_climates(cloud, lat_len, lon_len, years)
+        # self.__generate_min_temperatures(cloud, lat_len, lon_len, years)
+        # self.__generate_avg_temperatures(cloud, lat_len, lon_len, years)
+        # self.__generate_max_temperatures(cloud, lat_len, lon_len, years)
+        # self.__generate_precipitation(cloud, lat_len, lon_len, years)
         self.__generate_min_wet_bulb(cloud, lat_len, lon_len, years)
-        self.__generate_avg_wet_bulb(cloud, lat_len, lon_len, years)
-        self.__generate_max_wet_bulb(cloud, lat_len, lon_len, years)
-        self.__generate_cloud_cover(cloud, lat_len, lon_len, years)
-        self.__generate_wet_days(cloud, lat_len, lon_len, years)
-        self.__generate_frost_days(cloud, lat_len, lon_len, years)
+        # self.__generate_avg_wet_bulb(cloud, lat_len, lon_len, years)
+        # self.__generate_max_wet_bulb(cloud, lat_len, lon_len, years)
+        # self.__generate_cloud_cover(cloud, lat_len, lon_len, years)
+        # self.__generate_wet_days(cloud, lat_len, lon_len, years)
+        # self.__generate_frost_days(cloud, lat_len, lon_len, years)
 
         print("Generate Data: Finished data generation")
 
@@ -238,7 +238,7 @@ class GenerateData:
         self.io.reset_data()
         print("Generate Data: Finished precipitation generation")
 
-    # min wet bulb per year
+    # min wet bulb & relative humidity per year
     def __generate_min_wet_bulb(self, cloud: bool, lat_len, lon_len, years: list):
         print("Generate Data: Starting min wet bulb generation")
         self.io.check_data(DATA, ["tmn", "vap"])
@@ -251,11 +251,20 @@ class GenerateData:
                 for lon in range(lon_len):
                     year_data_tmn = self.io.get_year_data("tmn", year, lat, lon)
                     year_data_vap = self.io.get_year_data("vap", year, lat, lon)
-
+                    if len(year_data_tmn) != 0 and len(year_data_vap) != 0:
+                        wet_bulb_a = self.wb.compute_wet_bulb_a(year_data_tmn, year_data_vap)
+                        data_lat_lon = self.__generate_payload(lat, lon, round(min(wet_bulb_a), 2))
+                        data_output.append(data_lat_lon)
+                        del data_lat_lon
+            if cloud:
+                self.io.export_data_cloud(data_output)
+            else:
+                self.io.export_data_json(OUTPUT_DIR_JSON_DATA, "wet_bulb_min", 9, year, data_output)
+            del data_output
         self.io.reset_data()
         print("Generate Data: Finished min wet bulb generation")
 
-    # avg wet bulb per year
+    # avg wet bulb & relative humidity per year
     def __generate_avg_wet_bulb(self, cloud: bool, lat_len, lon_len, years: list):
         print("Generate Data: Starting avg wet bulb generation")
         self.io.check_data(DATA, ["tmp", "vap"])
@@ -272,7 +281,7 @@ class GenerateData:
         self.io.reset_data()
         print("Generate Data: Finished avg wet bulb generation")
 
-    # max wet bulb per year
+    # max wet bulb & relative humidity per year
     def __generate_max_wet_bulb(self, cloud: bool, lat_len, lon_len, years: list):
         print("Generate Data: Starting max wet bulb generation")
         self.io.check_data(DATA, ["tmx", "vap"])
