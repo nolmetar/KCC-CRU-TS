@@ -47,18 +47,18 @@ class GenerateData:
         else:
             years = self.io.get_years()
 
-        self.__generate_parameters(cloud, lat_len, lon_len, years)
-        self.__generate_climates(cloud, lat_len, lon_len, years)
+        # self.__generate_parameters(cloud, lat_len, lon_len, years)
+        # self.__generate_climates(cloud, lat_len, lon_len, years)
         self.__generate_min_temperatures(cloud, lat_len, lon_len, years)
-        self.__generate_avg_temperatures(cloud, lat_len, lon_len, years)
-        self.__generate_max_temperatures(cloud, lat_len, lon_len, years)
-        self.__generate_precipitation(cloud, lat_len, lon_len, years)
-        self.__generate_min_wet_bulb_hum(cloud, lat_len, lon_len, years)
-        self.__generate_avg_wet_bulb_hum(cloud, lat_len, lon_len, years)
-        self.__generate_max_wet_bulb_hum(cloud, lat_len, lon_len, years)
-        self.__generate_cloud_cover(cloud, lat_len, lon_len, years)
-        self.__generate_wet_days(cloud, lat_len, lon_len, years)
-        self.__generate_frost_days(cloud, lat_len, lon_len, years)
+        # self.__generate_avg_temperatures(cloud, lat_len, lon_len, years)
+        # self.__generate_max_temperatures(cloud, lat_len, lon_len, years)
+        # self.__generate_precipitation(cloud, lat_len, lon_len, years)
+        # self.__generate_min_wet_bulb_hum(cloud, lat_len, lon_len, years)
+        # self.__generate_avg_wet_bulb_hum(cloud, lat_len, lon_len, years)
+        # self.__generate_max_wet_bulb_hum(cloud, lat_len, lon_len, years)
+        # self.__generate_cloud_cover(cloud, lat_len, lon_len, years)
+        # self.__generate_wet_days(cloud, lat_len, lon_len, years)
+        # self.__generate_frost_days(cloud, lat_len, lon_len, years)
 
         print("Generate Data: Finished data generation")
 
@@ -99,7 +99,7 @@ class GenerateData:
                         data_lat_lon = self.__generate_payload(lat, lon, self.ko.get_index(symbols))
                         data_output.append(data_lat_lon)
                         del data_lat_lon
-            # self.gm.generate_map_climates(OUTPUT_DIR_MAPS, year, data_output)
+            self.gm.generate_map_climates(OUTPUT_DIR_MAPS, year, data_output)
             if cloud:
                 self.io.export_data_cloud(data_output)
             else:
@@ -125,6 +125,7 @@ class GenerateData:
                         data_lat_lon = self.__generate_payload(lat, lon, round(min(year_data_tmn), 2))
                         data_output.append(data_lat_lon)
                         del data_lat_lon
+            self.gm.generate_map_temp(OUTPUT_DIR_MAPS, year, data_output)
             if cloud:
                 self.io.export_data_cloud(data_output)
             else:
