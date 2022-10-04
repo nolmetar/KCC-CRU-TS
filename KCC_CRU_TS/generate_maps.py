@@ -56,6 +56,12 @@ class GenerateMaps:
         fig = plt.figure(figsize=(16, 12))
         chart = fig.add_subplot(projection=ccrs.PlateCarree())
         chart.set_extent([-180, 180, -90, 90], ccrs.PlateCarree())
+
+        rectangle = Rectangle((-180, -90), 360, 180)
+        rectangle.set_facecolor("black")
+        rectangle.set_alpha(0.2)
+        chart.add_patch(rectangle)
+
         chart.add_feature(c_feature.COASTLINE)
 
         patches = []
@@ -69,21 +75,32 @@ class GenerateMaps:
             if map_type == "rb":
                 if prop["p"] < 0:
                     scale = (prop["p"] / min_val)
+                    scale = 1 if scale > 1 else scale
                     r = 1 - scale
                     g = 1 - scale
                     b = 1
                 else:
                     scale = (prop["p"] / max_val)
+                    scale = 1 if scale > 1 else scale
                     r = 1
                     g = 1 - scale
                     b = 1 - scale
             elif map_type == "r":
                 scale = (prop["p"] / max_val)
+                scale = 1 if scale > 1 else scale
                 r = 1
                 g = 1 - scale
                 b = 1 - scale
             elif map_type == "b":
                 scale = (prop["p"] / max_val)
+                scale = 1 if scale > 1 else scale
+                r = 1 - scale
+                g = 1 - scale
+                b = 1
+            elif map_type == "b2":
+                scale = (prop["p"] / max_val)
+                scale = 1 if scale > 1 else scale
+                scale = round(scale, 1)
                 r = 1 - scale
                 g = 1 - scale
                 b = 1

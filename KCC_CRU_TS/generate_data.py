@@ -47,18 +47,18 @@ class GenerateData:
         else:
             years = self.io.get_years()
 
-        self.__generate_parameters(cloud, lat_len, lon_len, years)
-        self.__generate_climates(cloud, lat_len, lon_len, years)
-        self.__generate_min_temperatures(cloud, lat_len, lon_len, years)
-        self.__generate_avg_temperatures(cloud, lat_len, lon_len, years)
-        self.__generate_max_temperatures(cloud, lat_len, lon_len, years)
+        # self.__generate_parameters(cloud, lat_len, lon_len, years)
+        # self.__generate_climates(cloud, lat_len, lon_len, years)
+        # self.__generate_min_temperatures(cloud, lat_len, lon_len, years)
+        # self.__generate_avg_temperatures(cloud, lat_len, lon_len, years)
+        # self.__generate_max_temperatures(cloud, lat_len, lon_len, years)
         self.__generate_precipitation(cloud, lat_len, lon_len, years)
-        self.__generate_min_wet_bulb_hum(cloud, lat_len, lon_len, years)
-        self.__generate_avg_wet_bulb_hum(cloud, lat_len, lon_len, years)
-        self.__generate_max_wet_bulb_hum(cloud, lat_len, lon_len, years)
-        self.__generate_cloud_cover(cloud, lat_len, lon_len, years)
-        self.__generate_wet_days(cloud, lat_len, lon_len, years)
-        self.__generate_frost_days(cloud, lat_len, lon_len, years)
+        # self.__generate_min_wet_bulb_hum(cloud, lat_len, lon_len, years)
+        # self.__generate_avg_wet_bulb_hum(cloud, lat_len, lon_len, years)
+        # self.__generate_max_wet_bulb_hum(cloud, lat_len, lon_len, years)
+        # self.__generate_cloud_cover(cloud, lat_len, lon_len, years)
+        # self.__generate_wet_days(cloud, lat_len, lon_len, years)
+        # self.__generate_frost_days(cloud, lat_len, lon_len, years)
 
         print("Generate Data: Finished data generation")
 
@@ -217,10 +217,10 @@ class GenerateData:
                         data_lat_lon_sum = self.__generate_payload(lat, lon, round(sum(year_data_pre), 2))
                         data_output_sum.append(data_lat_lon_sum)
                         del data_lat_lon_sum
-            self.gm.generate_map_scale(OUTPUT_DIR_MAPS, "precipitation_min", 5, year, data_output_min, "b", 0, 600)
-            self.gm.generate_map_scale(OUTPUT_DIR_MAPS, "precipitation_avg", 6, year, data_output_avg, "b", 0, 900)
-            self.gm.generate_map_scale(OUTPUT_DIR_MAPS, "precipitation_max", 7, year, data_output_max, "b", 0, 4100)
-            self.gm.generate_map_scale(OUTPUT_DIR_MAPS, "precipitation_sum", 8, year, data_output_sum, "b", 0, 11000)
+            self.gm.generate_map_scale(OUTPUT_DIR_MAPS, "precipitation_min", 5, year, data_output_min, "b", 0, 400)
+            self.gm.generate_map_scale(OUTPUT_DIR_MAPS, "precipitation_avg", 6, year, data_output_avg, "b", 0, 700)
+            self.gm.generate_map_scale(OUTPUT_DIR_MAPS, "precipitation_max", 7, year, data_output_max, "b", 0, 3200)
+            self.gm.generate_map_scale(OUTPUT_DIR_MAPS, "precipitation_sum", 8, year, data_output_sum, "b", 0, 8500)
             if cloud:
                 self.io.export_data_cloud(data_output_min)
                 self.io.export_data_cloud(data_output_avg)
@@ -255,20 +255,20 @@ class GenerateData:
                     year_data_vap = self.io.get_year_data("vap", year, lat, lon)
                     if len(year_data_tmn) > 0 and len(year_data_vap) > 0:
                         rel_hum_a, wet_bulb_a = self.wb.compute_wet_bulb_a(year_data_tmn, year_data_vap)
-                        if rel_hum_a is not None or wet_bulb_a is not None:
-                            data_lat_lon_hum = self.__generate_payload(lat, lon, round(min(rel_hum_a), 2))
+                        if rel_hum_a is not None and wet_bulb_a is not None:
+                            data_lat_lon_hum = self.__generate_payload(lat, lon, round(max(rel_hum_a), 2))
                             data_lat_lon_wet = self.__generate_payload(lat, lon, round(min(wet_bulb_a), 2))
                             data_output_hum.append(data_lat_lon_hum)
                             data_output_wet.append(data_lat_lon_wet)
                             del data_lat_lon_hum
                             del data_lat_lon_wet
-            self.gm.generate_map_scale(OUTPUT_DIR_MAPS, "rel_hum_min", 9, year, data_output_hum, "b", 0, 100)
-            self.gm.generate_map_scale(OUTPUT_DIR_MAPS, "wet_bulb_min", 10, year, data_output_wet, "rb", -60, 60)
+            self.gm.generate_map_scale(OUTPUT_DIR_MAPS, "rel_hum_max", 9, year, data_output_hum, "b", 0, 100)
+            self.gm.generate_map_scale(OUTPUT_DIR_MAPS, "wet_bulb_min", 10, year, data_output_wet, "rb", -60, 40)
             if cloud:
                 self.io.export_data_cloud(data_output_hum)
                 self.io.export_data_cloud(data_output_wet)
             else:
-                self.io.export_data_json(OUTPUT_DIR_JSON_DATA, "rel_hum_min", 9, year, data_output_hum)
+                self.io.export_data_json(OUTPUT_DIR_JSON_DATA, "rel_hum_max", 9, year, data_output_hum)
                 self.io.export_data_json(OUTPUT_DIR_JSON_DATA, "wet_bulb_min", 10, year, data_output_wet)
             del data_output_hum
             del data_output_wet
@@ -292,15 +292,17 @@ class GenerateData:
                     year_data_vap = self.io.get_year_data("vap", year, lat, lon)
                     if len(year_data_tmp) > 0 and len(year_data_vap) > 0:
                         rel_hum_a, wet_bulb_a = self.wb.compute_wet_bulb_a(year_data_tmp, year_data_vap)
-                        if rel_hum_a is not None or wet_bulb_a is not None:
-                            data_lat_lon_hum = self.__generate_payload(lat, lon, round(min(rel_hum_a), 2))
-                            data_lat_lon_wet = self.__generate_payload(lat, lon, round(min(wet_bulb_a), 2))
+                        if rel_hum_a is not None and wet_bulb_a is not None:
+                            average_hum = sum(rel_hum_a) / len(rel_hum_a)
+                            average_wet = sum(wet_bulb_a) / len(wet_bulb_a)
+                            data_lat_lon_hum = self.__generate_payload(lat, lon, round(average_hum, 2))
+                            data_lat_lon_wet = self.__generate_payload(lat, lon, round(average_wet, 2))
                             data_output_hum.append(data_lat_lon_hum)
                             data_output_wet.append(data_lat_lon_wet)
                             del data_lat_lon_hum
                             del data_lat_lon_wet
             self.gm.generate_map_scale(OUTPUT_DIR_MAPS, "rel_hum_avg", 11, year, data_output_hum, "b", 0, 100)
-            self.gm.generate_map_scale(OUTPUT_DIR_MAPS, "wet_bulb_avg", 12, year, data_output_wet, "rb", -60, 60)
+            self.gm.generate_map_scale(OUTPUT_DIR_MAPS, "wet_bulb_avg", 12, year, data_output_wet, "rb", -60, 40)
             if cloud:
                 self.io.export_data_cloud(data_output_hum)
                 self.io.export_data_cloud(data_output_wet)
@@ -329,20 +331,20 @@ class GenerateData:
                     year_data_vap = self.io.get_year_data("vap", year, lat, lon)
                     if len(year_data_tmx) > 0 and len(year_data_vap) > 0:
                         rel_hum_a, wet_bulb_a = self.wb.compute_wet_bulb_a(year_data_tmx, year_data_vap)
-                        if rel_hum_a is not None or wet_bulb_a is not None:
+                        if rel_hum_a is not None and wet_bulb_a is not None:
                             data_lat_lon_hum = self.__generate_payload(lat, lon, round(min(rel_hum_a), 2))
-                            data_lat_lon_wet = self.__generate_payload(lat, lon, round(min(wet_bulb_a), 2))
+                            data_lat_lon_wet = self.__generate_payload(lat, lon, round(max(wet_bulb_a), 2))
                             data_output_hum.append(data_lat_lon_hum)
                             data_output_wet.append(data_lat_lon_wet)
                             del data_lat_lon_hum
                             del data_lat_lon_wet
-            self.gm.generate_map_scale(OUTPUT_DIR_MAPS, "rel_hum_max", 13, year, data_output_hum, "b", 0, 100)
-            self.gm.generate_map_scale(OUTPUT_DIR_MAPS, "wet_bulb_max", 14, year, data_output_wet, "rb", -60, 60)
+            self.gm.generate_map_scale(OUTPUT_DIR_MAPS, "rel_hum_min", 13, year, data_output_hum, "b", 0, 100)
+            self.gm.generate_map_scale(OUTPUT_DIR_MAPS, "wet_bulb_max", 14, year, data_output_wet, "rb", -60, 40)
             if cloud:
                 self.io.export_data_cloud(data_output_hum)
                 self.io.export_data_cloud(data_output_wet)
             else:
-                self.io.export_data_json(OUTPUT_DIR_JSON_DATA, "rel_hum_max", 13, year, data_output_hum)
+                self.io.export_data_json(OUTPUT_DIR_JSON_DATA, "rel_hum_min", 13, year, data_output_hum)
                 self.io.export_data_json(OUTPUT_DIR_JSON_DATA, "wet_bulb_max", 14, year, data_output_wet)
             del data_output_hum
             del data_output_wet

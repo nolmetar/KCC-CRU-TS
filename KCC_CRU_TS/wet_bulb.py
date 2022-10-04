@@ -21,12 +21,13 @@ class WetBulb:
         if len(temperatures) != len(pressures):
             return None, None
         for i in range(0, len(temperatures)):
-            rel_hum = self.compute_rel_humidity(temperatures[i], pressures[i])
-            if rel_hum is None:
-                return None, None
-            wet_bulb = self.compute_wet_bulb(temperatures[i], rel_hum)
-            rel_hum_a.append(rel_hum)
-            wet_bulb_a.append(wet_bulb)
+            if pressures[i] != 0:
+                rel_hum = self.compute_rel_humidity(temperatures[i], pressures[i])
+                if rel_hum is None:
+                    return None, None
+                wet_bulb = self.compute_wet_bulb(temperatures[i], rel_hum)
+                rel_hum_a.append(rel_hum)
+                wet_bulb_a.append(wet_bulb)
         return rel_hum_a, wet_bulb_a
 
     def compute_rel_humidity(self, temp_c, pres_hpa):
