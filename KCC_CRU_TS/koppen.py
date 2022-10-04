@@ -149,7 +149,7 @@ class Koppen:
         joined_symbols = "".join(symbols)
         return self.KOPPEN_INDEX[joined_symbols]
 
-    def get_index_rev(self, index: int):
+    def get_symbols(self, index: int):
         for key, value in self.KOPPEN_INDEX.items():
             if value == index:
                 return key

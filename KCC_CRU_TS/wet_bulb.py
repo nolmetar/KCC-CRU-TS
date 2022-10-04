@@ -31,8 +31,6 @@ class WetBulb:
         # calculate relative humidity
         temp_k = self.co.c_to_k(temp_c)
         vap_pres_hpa = self.__antoine_equation(temp_k)
-        if vap_pres_hpa is None:
-            return None
         # calculate relative humidity
         rel_hum_per = pres_hpa / vap_pres_hpa
         rel_hum = rel_hum_per * 100
@@ -51,8 +49,6 @@ class WetBulb:
         coefficient_a = 0
         coefficient_b = 0
         coefficient_c = 0
-        if temp_k < 255.9 or temp_k > 363:
-            return None
         if temp_k < 273.0:
             coefficient_a = self.COEFFICIENTS["255.9-272.0"][0]
             coefficient_b = self.COEFFICIENTS["255.9-272.0"][1]
