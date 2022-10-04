@@ -18,6 +18,8 @@ class WetBulb:
     def compute_wet_bulb_a(self, temperatures: list, pressures: list):
         rel_hum_a = list()
         wet_bulb_a = list()
+        if len(temperatures) != len(pressures):
+            return None, None
         for i in range(0, len(temperatures)):
             rel_hum = self.compute_rel_humidity(temperatures[i], pressures[i])
             if rel_hum is None:

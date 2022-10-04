@@ -42,6 +42,8 @@ class GenerateMaps:
         chart.add_feature(c_feature.BORDERS, linestyle='-', linewidth=0.5)
         chart.set_title(str(year) + " " + name)
         plt.savefig(path, bbox_inches='tight')
+        plt.close(fig)
+        del fig
         print("Generate Maps: finished map {} generation".format(path))
 
     @staticmethod
@@ -61,31 +63,31 @@ class GenerateMaps:
         for prop in props:
             lat = -90 + (prop["l"]/2)
             lon = -180 + (prop["o"]/2)
-            r = str(hex(255)).replace("0x", "")
-            g = str(hex(255)).replace("0x", "")
-            b = str(hex(255)).replace("0x", "")
+            r = 1
+            g = 1
+            b = 1
             if map_type == "rb":
                 if prop["p"] < 0:
                     scale = (prop["p"] / min_val)
-                    r = str(hex(int(255 - (255 * scale)))).replace("0x", "")
-                    g = str(hex(int(255 - (255 * scale)))).replace("0x", "")
-                    b = str(hex(255)).replace("0x", "")
+                    r = 1 - scale
+                    g = 1 - scale
+                    b = 1
                 else:
                     scale = (prop["p"] / max_val)
-                    r = str(hex(255)).replace("0x", "")
-                    g = str(hex(int(255 - (255 * scale)))).replace("0x", "")
-                    b = str(hex(int(255 - (255 * scale)))).replace("0x", "")
+                    r = 1
+                    g = 1 - scale
+                    b = 1 - scale
             elif map_type == "r":
                 scale = (prop["p"] / max_val)
-                r = str(hex(255)).replace("0x", "")
-                g = str(hex(int(255 - (255 * scale)))).replace("0x", "")
-                b = str(hex(int(255 - (255 * scale)))).replace("0x", "")
+                r = 1
+                g = 1 - scale
+                b = 1 - scale
             elif map_type == "b":
                 scale = (prop["p"] / max_val)
-                r = str(hex(int(255 - (255 * scale)))).replace("0x", "")
-                g = str(hex(int(255 - (255 * scale)))).replace("0x", "")
-                b = str(hex(255)).replace("0x", "")
-            color = "#" + r + g + b
+                r = 1 - scale
+                g = 1 - scale
+                b = 1
+            color = (r, g, b)
             rectangle = Rectangle((lon, lat), 0.5, 0.5)
             colors.append(color)
             patches.append(rectangle)
@@ -95,6 +97,8 @@ class GenerateMaps:
         chart.add_feature(c_feature.BORDERS, linestyle='-', linewidth=0.5)
         chart.set_title(str(year) + " " + name)
         plt.savefig(path, bbox_inches='tight')
+        plt.close(fig)
+        del fig
         print("Generate Maps: finished map {} generation".format(path))
 
     @staticmethod

@@ -47,18 +47,18 @@ class GenerateData:
         else:
             years = self.io.get_years()
 
-        # self.__generate_parameters(cloud, lat_len, lon_len, years)
-        # self.__generate_climates(cloud, lat_len, lon_len, years)
-        # self.__generate_min_temperatures(cloud, lat_len, lon_len, years)
-        # self.__generate_avg_temperatures(cloud, lat_len, lon_len, years)
-        # self.__generate_max_temperatures(cloud, lat_len, lon_len, years)
-        # self.__generate_precipitation(cloud, lat_len, lon_len, years)
+        self.__generate_parameters(cloud, lat_len, lon_len, years)
+        self.__generate_climates(cloud, lat_len, lon_len, years)
+        self.__generate_min_temperatures(cloud, lat_len, lon_len, years)
+        self.__generate_avg_temperatures(cloud, lat_len, lon_len, years)
+        self.__generate_max_temperatures(cloud, lat_len, lon_len, years)
+        self.__generate_precipitation(cloud, lat_len, lon_len, years)
         self.__generate_min_wet_bulb_hum(cloud, lat_len, lon_len, years)
         self.__generate_avg_wet_bulb_hum(cloud, lat_len, lon_len, years)
         self.__generate_max_wet_bulb_hum(cloud, lat_len, lon_len, years)
-        # self.__generate_cloud_cover(cloud, lat_len, lon_len, years)
-        # self.__generate_wet_days(cloud, lat_len, lon_len, years)
-        # self.__generate_frost_days(cloud, lat_len, lon_len, years)
+        self.__generate_cloud_cover(cloud, lat_len, lon_len, years)
+        self.__generate_wet_days(cloud, lat_len, lon_len, years)
+        self.__generate_frost_days(cloud, lat_len, lon_len, years)
 
         print("Generate Data: Finished data generation")
 
@@ -121,7 +121,7 @@ class GenerateData:
             for lat in range(lat_len):
                 for lon in range(lon_len):
                     year_data_tmn = self.io.get_year_data("tmn", year, lat, lon)
-                    if len(year_data_tmn) != 0:
+                    if len(year_data_tmn) > 0:
                         data_lat_lon = self.__generate_payload(lat, lon, round(min(year_data_tmn), 2))
                         data_output.append(data_lat_lon)
                         del data_lat_lon
@@ -147,7 +147,7 @@ class GenerateData:
             for lat in range(lat_len):
                 for lon in range(lon_len):
                     year_data_tmp = self.io.get_year_data("tmp", year, lat, lon)
-                    if len(year_data_tmp) != 0:
+                    if len(year_data_tmp) > 0:
                         average = sum(year_data_tmp) / len(year_data_tmp)
                         data_lat_lon = self.__generate_payload(lat, lon, round(average, 2))
                         data_output.append(data_lat_lon)
@@ -174,7 +174,7 @@ class GenerateData:
             for lat in range(lat_len):
                 for lon in range(lon_len):
                     year_data_tmx = self.io.get_year_data("tmx", year, lat, lon)
-                    if len(year_data_tmx) != 0:
+                    if len(year_data_tmx) > 0:
                         data_lat_lon = self.__generate_payload(lat, lon, round(max(year_data_tmx), 2))
                         data_output.append(data_lat_lon)
                         del data_lat_lon
@@ -203,7 +203,7 @@ class GenerateData:
             for lat in range(lat_len):
                 for lon in range(lon_len):
                     year_data_pre = self.io.get_year_data("pre", year, lat, lon)
-                    if len(year_data_pre) != 0:
+                    if len(year_data_pre) > 0:
                         data_lat_lon_min = self.__generate_payload(lat, lon, round(min(year_data_pre), 2))
                         data_output_min.append(data_lat_lon_min)
                         del data_lat_lon_min
@@ -217,10 +217,10 @@ class GenerateData:
                         data_lat_lon_sum = self.__generate_payload(lat, lon, round(sum(year_data_pre), 2))
                         data_output_sum.append(data_lat_lon_sum)
                         del data_lat_lon_sum
-            self.gm.generate_map_scale(OUTPUT_DIR_MAPS, "precipitation_min", 5, year, data_output_min, "b", 0, 2400)
-            self.gm.generate_map_scale(OUTPUT_DIR_MAPS, "precipitation_avg", 6, year, data_output_avg, "b", 0, 2400)
-            self.gm.generate_map_scale(OUTPUT_DIR_MAPS, "precipitation_max", 7, year, data_output_max, "b", 0, 2400)
-            self.gm.generate_map_scale(OUTPUT_DIR_MAPS, "precipitation_sum", 8, year, data_output_sum, "b", 0, 12000)
+            self.gm.generate_map_scale(OUTPUT_DIR_MAPS, "precipitation_min", 5, year, data_output_min, "b", 0, 600)
+            self.gm.generate_map_scale(OUTPUT_DIR_MAPS, "precipitation_avg", 6, year, data_output_avg, "b", 0, 900)
+            self.gm.generate_map_scale(OUTPUT_DIR_MAPS, "precipitation_max", 7, year, data_output_max, "b", 0, 4100)
+            self.gm.generate_map_scale(OUTPUT_DIR_MAPS, "precipitation_sum", 8, year, data_output_sum, "b", 0, 11000)
             if cloud:
                 self.io.export_data_cloud(data_output_min)
                 self.io.export_data_cloud(data_output_avg)
@@ -235,7 +235,6 @@ class GenerateData:
             del data_output_avg
             del data_output_max
             del data_output_sum
-
         self.io.reset_data()
         print("Generate Data: Finished precipitation generation")
 
@@ -254,7 +253,7 @@ class GenerateData:
                 for lon in range(lon_len):
                     year_data_tmn = self.io.get_year_data("tmn", year, lat, lon)
                     year_data_vap = self.io.get_year_data("vap", year, lat, lon)
-                    if len(year_data_tmn) != 0 and len(year_data_vap) != 0:
+                    if len(year_data_tmn) > 0 and len(year_data_vap) > 0:
                         rel_hum_a, wet_bulb_a = self.wb.compute_wet_bulb_a(year_data_tmn, year_data_vap)
                         if rel_hum_a is not None or wet_bulb_a is not None:
                             data_lat_lon_hum = self.__generate_payload(lat, lon, round(min(rel_hum_a), 2))
@@ -291,7 +290,7 @@ class GenerateData:
                 for lon in range(lon_len):
                     year_data_tmp = self.io.get_year_data("tmp", year, lat, lon)
                     year_data_vap = self.io.get_year_data("vap", year, lat, lon)
-                    if len(year_data_tmp) != 0 and len(year_data_vap) != 0:
+                    if len(year_data_tmp) > 0 and len(year_data_vap) > 0:
                         rel_hum_a, wet_bulb_a = self.wb.compute_wet_bulb_a(year_data_tmp, year_data_vap)
                         if rel_hum_a is not None or wet_bulb_a is not None:
                             data_lat_lon_hum = self.__generate_payload(lat, lon, round(min(rel_hum_a), 2))
@@ -328,7 +327,7 @@ class GenerateData:
                 for lon in range(lon_len):
                     year_data_tmx = self.io.get_year_data("tmx", year, lat, lon)
                     year_data_vap = self.io.get_year_data("vap", year, lat, lon)
-                    if len(year_data_tmx) != 0 and len(year_data_vap) != 0:
+                    if len(year_data_tmx) > 0 and len(year_data_vap) > 0:
                         rel_hum_a, wet_bulb_a = self.wb.compute_wet_bulb_a(year_data_tmx, year_data_vap)
                         if rel_hum_a is not None or wet_bulb_a is not None:
                             data_lat_lon_hum = self.__generate_payload(lat, lon, round(min(rel_hum_a), 2))
@@ -364,7 +363,7 @@ class GenerateData:
             for lat in range(lat_len):
                 for lon in range(lon_len):
                     year_data_cld = self.io.get_year_data("cld", year, lat, lon)
-                    if len(year_data_cld) != 0:
+                    if len(year_data_cld) > 0:
                         data_lat_lon_min = self.__generate_payload(lat, lon, round(min(year_data_cld), 2))
                         data_output_min.append(data_lat_lon_min)
                         del data_lat_lon_min
@@ -375,7 +374,7 @@ class GenerateData:
                         data_lat_lon_max = self.__generate_payload(lat, lon, round(max(year_data_cld), 2))
                         data_output_max.append(data_lat_lon_max)
                         del data_lat_lon_max
-            self.gm.generate_map_scale(OUTPUT_DIR_MAPS, "cloud_cover_min", 15, year, data_output_min, "b", 0, 100)
+            self.gm.generate_map_scale(OUTPUT_DIR_MAPS, "cloud_cover_min", 15, year, data_output_min, "b", 0, 90)
             self.gm.generate_map_scale(OUTPUT_DIR_MAPS, "cloud_cover_avg", 16, year, data_output_avg, "b", 0, 100)
             self.gm.generate_map_scale(OUTPUT_DIR_MAPS, "cloud_cover_max", 17, year, data_output_max, "b", 0, 100)
             if cloud:
@@ -389,7 +388,6 @@ class GenerateData:
             del data_output_min
             del data_output_avg
             del data_output_max
-
         self.io.reset_data()
         print("Generate Data: Finished cloud cover generation")
 
@@ -408,7 +406,7 @@ class GenerateData:
             for lat in range(lat_len):
                 for lon in range(lon_len):
                     year_data_wet = self.io.get_year_data("wet", year, lat, lon)
-                    if len(year_data_wet) != 0:
+                    if len(year_data_wet) > 0:
                         data_lat_lon_min = self.__generate_payload(lat, lon, round(min(year_data_wet), 2))
                         data_output_min.append(data_lat_lon_min)
                         del data_lat_lon_min
@@ -422,9 +420,9 @@ class GenerateData:
                         data_lat_lon_sum = self.__generate_payload(lat, lon, round(sum(year_data_wet), 2))
                         data_output_sum.append(data_lat_lon_sum)
                         del data_lat_lon_sum
-            self.gm.generate_map_scale(OUTPUT_DIR_MAPS, "wet_days_min", 18, year, data_output_min, "b", 0, 365)
-            self.gm.generate_map_scale(OUTPUT_DIR_MAPS, "wet_days_avg", 19, year, data_output_avg, "b", 0, 365)
-            self.gm.generate_map_scale(OUTPUT_DIR_MAPS, "wet_days_max", 20, year, data_output_max, "b", 0, 365)
+            self.gm.generate_map_scale(OUTPUT_DIR_MAPS, "wet_days_min", 18, year, data_output_min, "b", 0, 30)
+            self.gm.generate_map_scale(OUTPUT_DIR_MAPS, "wet_days_avg", 19, year, data_output_avg, "b", 0, 32)
+            self.gm.generate_map_scale(OUTPUT_DIR_MAPS, "wet_days_max", 20, year, data_output_max, "b", 0, 32)
             self.gm.generate_map_scale(OUTPUT_DIR_MAPS, "wet_days_sum", 21, year, data_output_sum, "b", 0, 365)
             if cloud:
                 self.io.export_data_cloud(data_output_min)
@@ -440,7 +438,6 @@ class GenerateData:
             del data_output_avg
             del data_output_max
             del data_output_sum
-
         self.io.reset_data()
         print("Generate Data: Finished wet days generation")
 
@@ -459,7 +456,7 @@ class GenerateData:
             for lat in range(lat_len):
                 for lon in range(lon_len):
                     year_data_frs = self.io.get_year_data("frs", year, lat, lon)
-                    if len(year_data_frs) != 0:
+                    if len(year_data_frs) > 0:
                         data_lat_lon_min = self.__generate_payload(lat, lon, round(min(year_data_frs), 2))
                         data_output_min.append(data_lat_lon_min)
                         del data_lat_lon_min
@@ -473,9 +470,9 @@ class GenerateData:
                         data_lat_lon_sum = self.__generate_payload(lat, lon, round(sum(year_data_frs), 2))
                         data_output_sum.append(data_lat_lon_sum)
                         del data_lat_lon_sum
-            self.gm.generate_map_scale(OUTPUT_DIR_MAPS, "frost_days_min", 22, year, data_output_min, "b", 0, 365)
-            self.gm.generate_map_scale(OUTPUT_DIR_MAPS, "frost_days_avg", 23, year, data_output_avg, "b", 0, 365)
-            self.gm.generate_map_scale(OUTPUT_DIR_MAPS, "frost_days_max", 24, year, data_output_max, "b", 0, 365)
+            self.gm.generate_map_scale(OUTPUT_DIR_MAPS, "frost_days_min", 22, year, data_output_min, "b", 0, 30)
+            self.gm.generate_map_scale(OUTPUT_DIR_MAPS, "frost_days_avg", 23, year, data_output_avg, "b", 0, 32)
+            self.gm.generate_map_scale(OUTPUT_DIR_MAPS, "frost_days_max", 24, year, data_output_max, "b", 0, 32)
             self.gm.generate_map_scale(OUTPUT_DIR_MAPS, "frost_days_sum", 25, year, data_output_sum, "b", 0, 365)
             if cloud:
                 self.io.export_data_cloud(data_output_min)
@@ -491,6 +488,5 @@ class GenerateData:
             del data_output_avg
             del data_output_max
             del data_output_sum
-
         self.io.reset_data()
         print("Generate Data: Finished frost days generation")
