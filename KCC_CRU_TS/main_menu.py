@@ -31,8 +31,7 @@ def main() -> None:
             break
         elif choice == 3:
             print("Main: 3 - Generate/Upload ALL Data/Maps")
-            # gd.generate_data(preview=False, cloud=True)
-            print("Disabled for safety reason")
+            gd.generate_data(preview=False, cloud=True)
             break
         else:
             print("Main: Exiting")

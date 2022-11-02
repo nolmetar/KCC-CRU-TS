@@ -240,9 +240,30 @@ class IOInterface:
             f.write(data_json)
         print("IO: exported json data : {}".format(path))
 
+    @staticmethod
+    def export_param_json(out_dir, name, params: list):
+        path = out_dir + "params-" + name + ".json"
+        print("IO: export json params : {}".format(path))
+        data_output = dict()
+        data_output["type"] = name
+        data_output["pl"] = params
+        if not os.path.exists(out_dir):
+            os.mkdir(out_dir)
+        data_json = json.dumps(data_output, indent=4)
+        with open(path, "w") as f:
+            f.write(data_json)
+        print("IO: exported json params : {}".format(path))
+
     # TODO export to mongoDB
     @staticmethod
     def export_data_cloud(datalist: list):
+        print("export to cloud")
+        for data in datalist:
+            # put many to cloud
+            pass
+
+    @staticmethod
+    def export_param_cloud(datalist: list):
         print("export to cloud")
         for data in datalist:
             # put many to cloud
