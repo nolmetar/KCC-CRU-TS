@@ -1,6 +1,7 @@
 #!python3
 import os
 import random
+import math
 import datetime
 import cartopy.crs as ccrs
 import cartopy.feature as c_feature
@@ -99,6 +100,7 @@ class GenerateMaps:
 
         patches = []
         colors = []
+        log_max_val = math.log2(max_val)
         for prop in props:
             lat = -90 + (prop["l"]/2)
             lon = -180 + (prop["o"]/2)
@@ -131,9 +133,9 @@ class GenerateMaps:
                 g = 1 - scale
                 b = 1
             elif map_type == "b2":
-                scale = (prop["p"] / max_val)
+                log_val = 0 if prop["p"] <= 1 else math.log2(prop["p"])
+                scale = (log_val / log_max_val)
                 scale = 1 if scale > 1 else scale
-                scale = round(scale, 1)
                 r = 1 - scale
                 g = 1 - scale
                 b = 1
@@ -156,7 +158,7 @@ class GenerateMaps:
             text = "Legend (gradient): white (" + str(min_val) + \
                    ") to blue (" + str(max_val) + "), gray (no data)"
         elif map_type == "b2":
-            text = "Legend (gradient): white (" + str(min_val) + \
+            text = "Legend (gradient, log): white (" + str(min_val) + \
                    ") to blue (" + str(max_val) + "), gray (no data)"
         now = datetime.datetime.now()
         text = text + " \nMade by climatle.earth (" + now.strftime("%Y-%m-%d") + ") with " \

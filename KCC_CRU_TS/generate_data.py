@@ -47,12 +47,12 @@ class GenerateData:
         else:
             years = self.io.get_years()
 
-        self.__generate_parameters(cloud)
+        # self.__generate_parameters(cloud)
         # self.__generate_climates(cloud, lat_len, lon_len, years)
         # self.__generate_min_temperatures(cloud, lat_len, lon_len, years)
         # self.__generate_avg_temperatures(cloud, lat_len, lon_len, years)
         # self.__generate_max_temperatures(cloud, lat_len, lon_len, years)
-        # self.__generate_precipitation(cloud, lat_len, lon_len, years)
+        self.__generate_precipitation(cloud, lat_len, lon_len, years)
         # self.__generate_min_wet_bulb_hum(cloud, lat_len, lon_len, years)
         # self.__generate_avg_wet_bulb_hum(cloud, lat_len, lon_len, years)
         # self.__generate_max_wet_bulb_hum(cloud, lat_len, lon_len, years)
@@ -227,10 +227,10 @@ class GenerateData:
                         data_lat_lon_sum = self.__generate_payload(lat, lon, round(sum(year_data_pre), 2))
                         data_output_sum.append(data_lat_lon_sum)
                         del data_lat_lon_sum
-            self.gm.generate_map_scale(OUTPUT_DIR_MAPS, "precipitation_min", 5, year, data_output_min, "b", 0, 400)
-            self.gm.generate_map_scale(OUTPUT_DIR_MAPS, "precipitation_avg", 6, year, data_output_avg, "b", 0, 700)
-            self.gm.generate_map_scale(OUTPUT_DIR_MAPS, "precipitation_max", 7, year, data_output_max, "b", 0, 3200)
-            self.gm.generate_map_scale(OUTPUT_DIR_MAPS, "precipitation_sum", 8, year, data_output_sum, "b", 0, 8500)
+            self.gm.generate_map_scale(OUTPUT_DIR_MAPS, "precipitation_min", 5, year, data_output_min, "b2", 0, 520)
+            self.gm.generate_map_scale(OUTPUT_DIR_MAPS, "precipitation_avg", 6, year, data_output_avg, "b2", 0, 780)
+            self.gm.generate_map_scale(OUTPUT_DIR_MAPS, "precipitation_max", 7, year, data_output_max, "b2", 0, 3200)
+            self.gm.generate_map_scale(OUTPUT_DIR_MAPS, "precipitation_sum", 8, year, data_output_sum, "b2", 0, 9300)
             if cloud:
                 self.io.export_data_cloud(data_output_min)
                 self.io.export_data_cloud(data_output_avg)
