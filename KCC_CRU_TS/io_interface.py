@@ -5,6 +5,8 @@ from datetime import datetime, timedelta
 import sys
 import os
 import json
+import csv
+import pandas as pd
 
 
 class IOInterface:
@@ -136,6 +138,27 @@ class IOInterface:
             self.__imported_data.append(key)
             file.close()
         print("IO: data imported {}".format(keys))
+
+    @staticmethod
+    def import_csv(path: str):
+        csv_list = list()
+        header = []
+        with open(path, mode='r', encoding="utf8") as csv_file:
+            reader = csv.reader(csv_file)
+            is_header = True
+            for row in reader:
+                item = dict()
+                if is_header:
+                    header = row
+                    is_header = False
+                else:
+                    i = 0
+                    while i < len(header):
+                        item[header[i]] = row[i]
+                        i += 1
+                    csv_list.append(item)
+                del item
+        return csv_list
 
     def reset_data(self):
         self.__data.clear()

@@ -16,6 +16,7 @@ DATA = {
     "wet": "DATA/cru_ts4.06.1901.2021.wet.dat.nc",
     "frs": "DATA/cru_ts4.06.1901.2021.frs.dat.nc"
 }
+CITIES = "DATA/worldcities.csv"
 
 # Cloud: Collection params
 OUTPUT_DIR_JSON_PARAM = "OUTPUT/JSON-PARAMS/"
@@ -48,17 +49,17 @@ class GenerateData:
             years = self.io.get_years()
 
         self.__generate_parameters(save_data, cloud)
-        self.__generate_climates(save_data, cloud, gen_maps, lat_len, lon_len, years)
-        self.__generate_min_temperatures(save_data, cloud, gen_maps, lat_len, lon_len, years)
-        self.__generate_avg_temperatures(save_data, cloud, gen_maps, lat_len, lon_len, years)
-        self.__generate_max_temperatures(save_data, cloud, gen_maps, lat_len, lon_len, years)
-        self.__generate_precipitation(save_data, cloud, gen_maps, lat_len, lon_len, years)
-        self.__generate_min_wet_bulb_hum(save_data, cloud, gen_maps, lat_len, lon_len, years)
-        self.__generate_avg_wet_bulb_hum(save_data, cloud, gen_maps, lat_len, lon_len, years)
-        self.__generate_max_wet_bulb_hum(save_data, cloud, gen_maps, lat_len, lon_len, years)
-        self.__generate_cloud_cover(save_data, cloud, gen_maps, lat_len, lon_len, years)
-        self.__generate_wet_days(save_data, cloud, gen_maps, lat_len, lon_len, years)
-        self.__generate_frost_days(save_data, cloud, gen_maps, lat_len, lon_len, years)
+        # self.__generate_climates(save_data, cloud, gen_maps, lat_len, lon_len, years)
+        # self.__generate_min_temperatures(save_data, cloud, gen_maps, lat_len, lon_len, years)
+        # self.__generate_avg_temperatures(save_data, cloud, gen_maps, lat_len, lon_len, years)
+        # self.__generate_max_temperatures(save_data, cloud, gen_maps, lat_len, lon_len, years)
+        # self.__generate_precipitation(save_data, cloud, gen_maps, lat_len, lon_len, years)
+        # self.__generate_min_wet_bulb_hum(save_data, cloud, gen_maps, lat_len, lon_len, years)
+        # self.__generate_avg_wet_bulb_hum(save_data, cloud, gen_maps, lat_len, lon_len, years)
+        # self.__generate_max_wet_bulb_hum(save_data, cloud, gen_maps, lat_len, lon_len, years)
+        # self.__generate_cloud_cover(save_data, cloud, gen_maps, lat_len, lon_len, years)
+        # self.__generate_wet_days(save_data, cloud, gen_maps, lat_len, lon_len, years)
+        # self.__generate_frost_days(save_data, cloud, gen_maps, lat_len, lon_len, years)
 
         print("Generate Data: Finished data generation")
 
@@ -82,12 +83,14 @@ class GenerateData:
         for lat in range(lat_len):
             for lon in range(lon_len):
                 break
+        cities = self.io.import_csv(CITIES)
 
         if save_data:
             if cloud:
                 print("cloud")
             else:
                 self.io.export_param_json(OUTPUT_DIR_JSON_PARAM, "year", years)
+                self.io.export_param_json(OUTPUT_DIR_JSON_PARAM, "city", cities)
 
         print("Generate Data: Finished parameters generation")
 
